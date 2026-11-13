@@ -46,7 +46,7 @@ function getPlatformLabel(value) {
     : "Platform";
 }
 
-function GameCard({ game, showNewBadge = false, className = "" }) {
+function GameCard({ game, badgeType = "", className = "" }) {
   const poster = game?.poster || game?.game_poster || "";
   const [failedPoster, setFailedPoster] = useState("");
   const title = game?.title || "Untitled Game";
@@ -79,7 +79,11 @@ function GameCard({ game, showNewBadge = false, className = "" }) {
           </div>
         )}
 
-        {showNewBadge && <span className="game-card-new">NEW</span>}
+        {badgeType && (
+          <span className={`game-card-new ${badgeType === "UPDATE" ? "game-card-update" : ""}`}>
+            {badgeType}
+          </span>
+        )}
       </div>
 
       <div className="game-card-info">

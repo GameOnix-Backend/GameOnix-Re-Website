@@ -78,6 +78,11 @@
   box-shadow: 0 3px 12px rgba(255, 77, 141, 0.3);
 }
 
+.game-card-update {
+  background: linear-gradient(135deg, #448aff, #20c9a6);
+  box-shadow: 0 3px 12px rgba(68, 138, 255, 0.3);
+}
+
 .game-card-info {
   min-width: 0;
   padding: 12px 12px 15px;

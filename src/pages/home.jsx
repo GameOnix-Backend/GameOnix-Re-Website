@@ -34,14 +34,16 @@ function getAddedAt(game) {
   return Number.isFinite(timestamp) ? timestamp : null;
 }
 
-function isNewGame(game, now = Date.now()) {
+function getGameBadgeType(game, now = Date.now()) {
   const addedAt = getAddedAt(game);
 
-  return (
+  const isRecent =
     addedAt !== null &&
     addedAt <= now &&
-    now - addedAt < NEW_BADGE_DURATION
-  );
+    now - addedAt < NEW_BADGE_DURATION;
+
+  if (!isRecent) return "";
+  return game?.releaseType === "update" ? "UPDATE" : "NEW";
 }
 
 function getGameList(data) {
@@ -212,7 +214,7 @@ function GamesCarousel({ games, platform, category, now }) {
           <GameCard
             key={`${category.id}-${game.id ?? game.slug}`}
             game={game}
-            showNewBadge={isNewGame(game, now)}
+            badgeType={getGameBadgeType(game, now)}
             className="home-game-card"
           />
         ))}

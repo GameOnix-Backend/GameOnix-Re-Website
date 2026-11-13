@@ -32,19 +32,21 @@ function normalizePlatform(value) {
   return platform;
 }
 
-function isNewGame(game) {
+function getGameBadgeType(game) {
   const value = game?.createdAt;
 
-  if (!value || typeof value !== "string") return false;
+  if (!value || typeof value !== "string") return "";
 
   const timestamp = Date.parse(value);
   const now = Date.now();
 
-  return (
+  const isRecent =
     Number.isFinite(timestamp) &&
     timestamp <= now &&
-    now - timestamp < NEW_BADGE_DURATION
-  );
+    now - timestamp < NEW_BADGE_DURATION;
+
+  if (!isRecent) return "";
+  return game?.releaseType === "update" ? "UPDATE" : "NEW";
 }
 
 function Games() {
@@ -178,7 +180,7 @@ function Games() {
             <GameCard
               key={game.slug}
               game={game}
-              showNewBadge={isNewGame(game)}
+              badgeType={getGameBadgeType(game)}
             />
           ))}
         </div>
