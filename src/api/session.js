@@ -1,6 +1,9 @@
 const SESSION_TOKEN_KEY = "gameonix_session_token";
 const COMMUNITY_AUTH_ME_URL =
   "https://gameonix-backend.vercel.app/api/auth/me";
+const REVIEWS_API_URL =
+  import.meta.env.VITE_REVIEWS_API_URL ||
+  "https://gameonix-backend.vercel.app/api/auth/comments";
 
 export async function getCommunityApiToken() {
   const response = await fetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {
@@ -14,6 +17,43 @@ export async function getCommunityApiToken() {
   }
 
   return data.token;
+}
+
+export async function getReviews({ target, gameSlug } = {}) {
+  const url = new URL(REVIEWS_API_URL);
+  if (target) url.searchParams.set("target", target);
+  if (gameSlug) url.searchParams.set("gameSlug", gameSlug);
+
+  const response = await fetch(url, {
+    headers: { Accept: "application/json" },
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || !Array.isArray(data.reviews)) {
+    throw new Error(data.error || "Unable to load reviews. Please try again.");
+  }
+
+  return data.reviews;
+}
+
+export async function saveReview(review) {
+  const token = await getCommunityApiToken();
+  const response = await fetch(REVIEWS_API_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(review),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || !data.review) {
+    throw new Error(data.error || "Unable to save your review.");
+  }
+
+  return data.review;
 }
 
 export function getSessionToken() {

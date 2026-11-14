@@ -18,6 +18,7 @@ import GameRequest from "./pages/game-request";
 import Notifications, { AdminActions } from "./pages/Notifications";
 import Orders from "./pages/Orders";
 import Support from "./pages/Support";
+import ReviewsPage from "./pages/reviews";
 
 import PageTitle from "./components/PageTitle";
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/admin-actions" element={<AdminActions />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
 
           <Route path="/games" element={<Games />} />
           <Route path="/search" element={<SearchResults />} />

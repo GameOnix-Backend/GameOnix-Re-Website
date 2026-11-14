@@ -29,6 +29,7 @@ import {
 import { getCommunityApiToken } from "../api/session";
 import { useAuth } from "../context/AuthContext";
 import { getGameCategories } from "../utils/game-categories";
+import { GameReviews } from "./reviews";
 
 import "./../style/game-details-style.css";
 
@@ -417,6 +418,14 @@ function GameDetails() {
                 >
                     Add-Ons
                 </button>
+
+                <button
+                    type="button"
+                    className={activeTab === "reviews" ? "active" : ""}
+                    onClick={() => setActiveTab("reviews")}
+                >
+                    Reviews
+                </button>
             </nav>
 
             {activeTab === "overview" ? (
@@ -709,11 +718,13 @@ function GameDetails() {
                         </p>
                     </aside>
                 </section>
-            ) : (
+            ) : activeTab === "addons" ? (
                 <section className="game-addons">
                     <h2>Add-Ons</h2>
                     <p>No add-ons are listed for this game yet.</p>
                 </section>
+            ) : (
+                <GameReviews slug={game.slug} title={game.title} />
             )}
         </main>
         {reportOpen &&

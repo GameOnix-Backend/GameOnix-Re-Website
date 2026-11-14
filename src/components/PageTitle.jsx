@@ -19,6 +19,7 @@ const pageTitles = {
   "/request-game": "Request a Game",
   "/orders": "My Orders",
   "/support": "Support",
+  "/reviews": "GameOnix Reviews",
   "/search": "Search Games",
   "/shopping/game-cards": "Game Cards",
 };
@@ -32,6 +33,8 @@ const pageDescriptions = {
     "Browse the GameOnix collection of PC, PlayStation, and other platform games.",
   "/shopping/game-cards":
     "Explore game cards and digital gaming products available through GameOnix.",
+  "/reviews":
+    "Read community feedback and share your experience with the GameOnix website.",
 };
 
 const DEFAULT_DESCRIPTION =
