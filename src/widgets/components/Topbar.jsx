@@ -1276,6 +1276,19 @@ function Topbar() {
                                                                                     <strong>{value}</strong>
                                                                                 </div>
                                                                         ))}
+                                                                            {Array.isArray(details?.giftCardCodes) &&
+                                                                                details.giftCardCodes.length > 0 && (
+                                                                                    <div className="topbar-notification-codes">
+                                                                                        <span>Gift card codes</span>
+                                                                                        <ul>
+                                                                                            {details.giftCardCodes.map((code, index) => (
+                                                                                                <li key={`${code}-${index}`}>
+                                                                                                    <code>{code}</code>
+                                                                                                </li>
+                                                                                            ))}
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                )}
                                                                             <div className={`topbar-notification-status ${notificationStatus}`}>
                                                                                 <FontAwesomeIcon
                                                                                 className="topbar-notification-status-icon"

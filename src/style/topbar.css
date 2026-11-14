@@ -1345,3 +1345,40 @@
   outline: 2px solid #a78bfa;
   outline-offset: -3px;
 }
+
+.topbar-notification-codes {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgb(167 139 250 / 20%);
+}
+
+.topbar-notification-codes > span {
+  color: #b7a2ff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.topbar-notification-codes ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topbar-notification-codes code {
+  display: block;
+  padding: 6px 9px;
+  border: 1px solid rgb(167 139 250 / 24%);
+  border-radius: 7px;
+  background: rgb(139 92 246 / 8%);
+  color: #f4f0ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: .05em;
+  overflow-wrap: anywhere;
+}

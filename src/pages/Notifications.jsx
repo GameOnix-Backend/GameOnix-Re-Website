@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
+  faCheck,
   faCheckDouble,
   faChevronDown,
   faCircleCheck,
+  faCopy,
   faGamepad,
   faMobileScreenButton,
   faRotateRight,
@@ -19,6 +21,12 @@ import {
 
 import { getCommunityApiToken } from "../api/session";
 import { useAuth } from "../context/AuthContext";
+import { buildNotificationDetailRows } from "../utils/notificationDetails";
+import {
+  PURCHASE_TRANSACTION_TYPE,
+  WALLET_API_URL,
+  parseOrderDetails,
+} from "../utils/orders";
 import "./../style/notifications-style.css";
 
 const NOTIFICATIONS_URL =
@@ -46,69 +54,6 @@ function getNotificationIcon(platform) {
   return faGamepad;
 }
 
-function getDetails(notification) {
-  const details = notification.details;
-  if (!details || typeof details !== "object" || Array.isArray(details)) {
-    return [];
-  }
-
-  const preferredLabels = {
-    gameTitle: "Game",
-    gameName: "Game",
-    gameType: "Genre",
-    platform: "Platform",
-    version: "Version",
-    fileType: "Download type",
-    size: "Game size",
-    publisher: "Publisher",
-    username: "Username",
-    email: "Account email",
-    description: "Reported issue",
-    report: "Reported issue",
-    reply: "Team reply",
-    paymentMethod: "Payment method",
-    amount: "Amount",
-    status: "Status",
-    requestId: "Request ID",
-    topicLabel: "Topic",
-    orderId: "Order ID",
-  };
-
-  return Object.entries(details)
-    .filter(([key, value]) => {
-      return (
-        key !== "gameIcon" &&
-        key !== "gameLink" &&
-        key !== "imageData" &&
-        !(key === "gameName" && details.gameTitle) &&
-        !(key === "topic" && details.topicLabel) &&
-        value !== null &&
-        value !== undefined &&
-        String(value).trim() !== ""
-      );
-    })
-    .map(([key, value]) => ({
-      label:
-        preferredLabels[key] ||
-        key.replace(/([A-Z])/g, " $1").replace(/^./, (character) =>
-          character.toUpperCase()
-        ),
-      value:
-        key === "status" &&
-        ["pending", "accepted", "rejected"].includes(
-          String(value).toLowerCase()
-        )
-          ? {
-              pending: "Pending",
-              accepted: "Accepted",
-              rejected: "Rejected",
-            }[String(value).toLowerCase()]
-          : typeof value === "object"
-            ? JSON.stringify(value)
-            : String(value),
-      long: ["description", "report", "reply"].includes(key),
-    }));
-}
 
 async function compressNotificationImage(file) {
   if (!file) return "";
@@ -159,6 +104,11 @@ function Notifications() {
   const [actionLoading, setActionLoading] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [codesByOrder, setCodesByOrder] = useState({});
+  const [codesLoading, setCodesLoading] = useState(false);
+  const [copiedCode, setCopiedCode] = useState("");
+  const codesLoadedRef = useRef(false);
+  const copyTimer = useRef(null);
   const unreadCount = useMemo(
     () => notifications.filter((notification) => !notification.readAt).length,
     [notifications]
@@ -214,6 +164,86 @@ function Notifications() {
       );
     };
   }, [user, loadNotifications]);
+
+  // Gift card orders are delivered as codes. They are stored with the order in
+  // the wallet ledger; older notifications were saved without them, so the
+  // codes are looked up once on demand.
+  const needsGiftCardCodes = useMemo(() => {
+    if (!expandedId) return false;
+    const notification = notifications.find((item) => item.id === expandedId);
+    const details = notification?.details || {};
+    return (
+      details.isGiftCard === true &&
+      !(Array.isArray(details.giftCardCodes) && details.giftCardCodes.length > 0)
+    );
+  }, [expandedId, notifications]);
+
+  useEffect(() => {
+    if (!needsGiftCardCodes || codesLoadedRef.current) return undefined;
+
+    codesLoadedRef.current = true;
+    let active = true;
+
+    async function loadGiftCardCodes() {
+      setCodesLoading(true);
+      try {
+        const token = await getCommunityApiToken();
+        const response = await fetch(WALLET_API_URL, {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "omit",
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to load gift card codes.");
+        }
+
+        const nextCodes = {};
+        (Array.isArray(data.transactions) ? data.transactions : []).forEach(
+          (transaction) => {
+            if (transaction?.type !== PURCHASE_TRANSACTION_TYPE) return;
+            const order = parseOrderDetails(transaction.description);
+            const codes = Array.isArray(order.giftCardCodes)
+              ? order.giftCardCodes.filter(
+                  (code) => typeof code === "string" && code.trim()
+                )
+              : [];
+            if (codes.length) nextCodes[transaction.id] = codes;
+          }
+        );
+        if (active) setCodesByOrder(nextCodes);
+      } catch (codesError) {
+        console.error("Gift card code lookup failed:", codesError);
+      } finally {
+        if (active) setCodesLoading(false);
+      }
+    }
+
+    void loadGiftCardCodes();
+    return () => {
+      active = false;
+    };
+  }, [needsGiftCardCodes]);
+
+  useEffect(
+    () => () => {
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
+    },
+    []
+  );
+
+  async function copyGiftCardCode(code) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopiedCode(""), 2000);
+    } catch (copyError) {
+      console.error("Copy failed:", copyError);
+    }
+  }
 
   async function updateNotifications(method, body) {
     setActionLoading(true);
@@ -422,7 +452,18 @@ function Notifications() {
             {visibleNotifications.map((notification) => {
               const details = notification.details || {};
               const expanded = expandedId === notification.id;
-              const rows = getDetails(notification);
+              const rows = buildNotificationDetailRows(notification);
+              const storedCodes = Array.isArray(details.giftCardCodes)
+                ? details.giftCardCodes.filter(
+                    (code) => typeof code === "string" && code.trim()
+                  )
+                : [];
+              const giftCardCodes =
+                details.isGiftCard === true
+                  ? storedCodes.length
+                    ? storedCodes
+                    : codesByOrder[details.requestId] || []
+                  : [];
               return (
                 <article
                   className={`notifications-card${notification.readAt ? "" : " unread"}${expanded ? " expanded" : ""}`}
@@ -493,6 +534,50 @@ function Notifications() {
                           <strong>{row.value}</strong>
                         </div>
                       ))}
+                      {giftCardCodes.length > 0 && (
+                        <section className="notifications-codes">
+                          <h3>
+                            Gift card codes
+                            <small>
+                              {giftCardCodes.length === 1
+                                ? "1 code"
+                                : `${giftCardCodes.length} codes`}{" "}
+                              · delivered with this order
+                            </small>
+                          </h3>
+                          <ul>
+                            {giftCardCodes.map((code, index) => (
+                              <li key={`${code}-${index}`}>
+                                <code>{code}</code>
+                                <button
+                                  type="button"
+                                  className={`notifications-code-copy${copiedCode === code ? " is-copied" : ""}`}
+                                  onClick={() => copyGiftCardCode(code)}
+                                  title="Copy code"
+                                  aria-label={`Copy gift card code ${index + 1}`}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={copiedCode === code ? faCheck : faCopy}
+                                  />
+                                  <span>
+                                    {copiedCode === code ? "Copied" : "Copy"}
+                                  </span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+                      {details.isGiftCard === true &&
+                        giftCardCodes.length === 0 &&
+                        codesLoading && (
+                          <p
+                            className="notifications-codes-loading"
+                            role="status"
+                          >
+                            Loading gift card codes…
+                          </p>
+                        )}
                       {typeof details.imageData === "string" && (
                         <img
                           className="notifications-message-image"
