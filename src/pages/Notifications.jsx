@@ -93,7 +93,19 @@ function getDetails(notification) {
         key.replace(/([A-Z])/g, " $1").replace(/^./, (character) =>
           character.toUpperCase()
         ),
-      value: typeof value === "object" ? JSON.stringify(value) : String(value),
+      value:
+        key === "status" &&
+        ["pending", "accepted", "rejected"].includes(
+          String(value).toLowerCase()
+        )
+          ? {
+              pending: "Pending",
+              accepted: "Accepted",
+              rejected: "Rejected",
+            }[String(value).toLowerCase()]
+          : typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value),
       long: ["description", "report", "reply"].includes(key),
     }));
 }

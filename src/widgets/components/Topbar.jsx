@@ -995,31 +995,47 @@ function Topbar() {
                                                             : Number(amountFromMessage);
                                                     const notificationStatusValue =
                                                         String(details?.status || "").toLowerCase();
+                                                    const isGameRequestReply =
+                                                        notification.type === "game_request_reply";
                                                     const notificationStatus =
-                                                        ["completed", "success"].includes(
-                                                            notificationStatusValue
-                                                        )
-                                                            ? "approved"
-                                                            : notificationStatusValue === "rejected"
-                                                                ? "cancelled"
-                                                            : details?.status ||
-                                                        (notification.title.toLowerCase().includes("approv")
-                                                            ? "approved"
-                                                            : notification.title.toLowerCase().includes("cancel")
-                                                                ? "cancelled"
-                                                                : notification.title.toLowerCase().includes("sent") ||
-                                                                    notification.title.toLowerCase().includes("updated")
-                                                                    ? "pending"
-                                                                    : "unknown");
-                                                    const statusLabel = {
-                                                        pending: "Awaiting admin response",
-                                                        approved: ["completed", "success"].includes(
-                                                            notificationStatusValue
-                                                        )
-                                                            ? "Completed"
-                                                            : "Approved",
-                                                        cancelled: "Cancelled",
-                                                    }[notificationStatus] || notification.title;
+                                                        isGameRequestReply
+                                                            ? notificationStatusValue === "accepted"
+                                                                ? "approved"
+                                                                : notificationStatusValue === "rejected"
+                                                                    ? "cancelled"
+                                                                    : notificationStatusValue === "pending"
+                                                                        ? "pending"
+                                                                        : "unknown"
+                                                            : ["completed", "success"].includes(
+                                                                notificationStatusValue
+                                                            )
+                                                                ? "approved"
+                                                                : notificationStatusValue === "rejected"
+                                                                    ? "cancelled"
+                                                                    : details?.status ||
+                                                                (notification.title.toLowerCase().includes("approv")
+                                                                    ? "approved"
+                                                                    : notification.title.toLowerCase().includes("cancel")
+                                                                        ? "cancelled"
+                                                                        : notification.title.toLowerCase().includes("sent") ||
+                                                                            notification.title.toLowerCase().includes("updated")
+                                                                            ? "pending"
+                                                                            : "unknown");
+                                                    const statusLabel = isGameRequestReply
+                                                        ? {
+                                                            pending: "Pending",
+                                                            accepted: "Accepted",
+                                                            rejected: "Rejected",
+                                                        }[notificationStatusValue] || notification.title
+                                                        : {
+                                                            pending: "Awaiting admin response",
+                                                            approved: ["completed", "success"].includes(
+                                                                notificationStatusValue
+                                                            )
+                                                                ? "Completed"
+                                                                : "Approved",
+                                                            cancelled: "Cancelled",
+                                                        }[notificationStatus] || notification.title;
 
                                                     return (
                                                         <article
