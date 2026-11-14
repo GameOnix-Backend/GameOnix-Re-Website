@@ -80,7 +80,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
         )}
 
         {badgeType && (
-          <span className={`game-card-new ${badgeType === "UPDATED" ? "game-card-update" : ""}`}>
+          <span className={`game-card-new ${badgeType === "UPDATE" ? "game-card-update" : ""}`}>
             {badgeType}
           </span>
         )}
