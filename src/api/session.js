@@ -1,9 +1,11 @@
 const SESSION_TOKEN_KEY = "gameonix_session_token";
 const COMMUNITY_AUTH_ME_URL =
   "https://gameonix-backend.vercel.app/api/auth/me";
+// Reviews are served by the community endpoint (`?reviews=public`) because the
+// Vercel Hobby plan limits a deployment to 12 serverless functions.
 const REVIEWS_API_URL =
   import.meta.env.VITE_REVIEWS_API_URL ||
-  "https://gameonix-backend.vercel.app/api/auth/comments";
+  "https://gameonix-backend.vercel.app/api/auth/me?reviews=public";
 
 export async function getCommunityApiToken() {
   const response = await fetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {

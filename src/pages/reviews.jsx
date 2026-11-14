@@ -197,6 +197,12 @@ function ReviewSection({ target, gameSlug, gameTitle }) {
                 <ReviewStars rating={review.rating} />
               </div>
               <p>{review.comment}</p>
+              {review.adminReply && (
+                <div className="review-reply">
+                  <span>GameOnix reply</span>
+                  <p>{review.adminReply}</p>
+                </div>
+              )}
             </article>
           ))}
         </div>

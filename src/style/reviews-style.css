@@ -272,6 +272,33 @@
   overflow-wrap: anywhere;
 }
 
+.review-reply {
+  margin-top: 13px;
+  border-left: 2px solid #6d5aa8;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  background: var(--bg-primary, #101014);
+}
+
+.review-reply span {
+  display: block;
+  margin-bottom: 5px;
+  color: #a895ff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.review-reply p {
+  margin: 0;
+  color: var(--text-secondary, #c0bec8);
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .reviews-state {
   padding: 24px;
   color: var(--text-secondary, #b8b8c2);
