@@ -842,7 +842,7 @@ function GameDetails() {
                                             <span className="game-addon-open">
                                                 <FontAwesomeIcon
                                                     icon={
-                                                        faArrowUpRightFromSquare
+                                                        faDownload
                                                     }
                                                 />
                                             </span>
