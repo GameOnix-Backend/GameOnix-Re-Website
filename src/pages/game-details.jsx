@@ -4,7 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faArrowLeft,
-    faArrowUpRightFromSquare,
     faDownload,
     faHeart,
     faBug,
@@ -29,7 +28,9 @@ import {
 } from "../api/favorites";
 import { getCommunityApiToken } from "../api/session";
 import { useAuth } from "../context/AuthContext";
+import AddonsPanel from "../components/AddonsPanel";
 import { getGameCategories } from "../utils/game-categories";
+import { getAddonList } from "../utils/addons";
 import { GameReviews } from "./reviews";
 
 import "./../style/game-details-style.css";
@@ -45,25 +46,6 @@ const GAME_REPORT_API_URL =
 function getGameList(data) {
     if (Array.isArray(data)) return data;
     return Array.isArray(data?.games) ? data.games : [];
-}
-
-function getAddonList(addons) {
-    if (!Array.isArray(addons)) return [];
-
-    return addons.filter(
-        (addon) => addon && String(addon.name || "").trim().length > 0
-    );
-}
-
-function addonInitials(name) {
-    const words = String(name || "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-
-    if (!words.length) return "?";
-    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-    return `${words[0][0]}${words[1][0]}`.toUpperCase();
 }
 
 function isLoginError(err) {
@@ -97,7 +79,6 @@ function GameDetails() {
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [failedImages, setFailedImages] = useState([]);
-    const [failedAddonLogos, setFailedAddonLogos] = useState([]);
     const [activeTab, setActiveTab] = useState("overview");
     const [reportOpen, setReportOpen] = useState(false);
     const [reportDescription, setReportDescription] = useState("");
@@ -129,7 +110,6 @@ function GameDetails() {
                 setError("");
                 setGame(null);
                 setFailedImages([]);
-                setFailedAddonLogos([]);
                 setSelectedImage(0);
                 setActiveTab("overview");
 
@@ -752,127 +732,7 @@ function GameDetails() {
                     </aside>
                 </section>
             ) : activeTab === "addons" ? (
-                <section className="game-addons">
-                    <header className="game-addons-head">
-                        <h2>Add-Ons</h2>
-                        {addons.length > 0 && (
-                            <span className="game-addons-count">
-                                {addons.length}{" "}
-                                {addons.length === 1 ? "package" : "packages"}
-                            </span>
-                        )}
-                    </header>
-
-                    {addons.length === 0 ? (
-                        <p>No add-ons are listed for this game yet.</p>
-                    ) : (
-                        <ul className="game-addon-list">
-                            {addons.map((addon, index) => {
-                                const logo =
-                                    typeof addon.logo === "string"
-                                        ? addon.logo.trim()
-                                        : "";
-                                const link =
-                                    typeof addon.link === "string"
-                                        ? addon.link.trim()
-                                        : "";
-                                const type = String(addon.type || "").trim();
-                                const size = String(addon.size || "").trim();
-                                const description = String(
-                                    addon.description || ""
-                                ).trim();
-                                const logoVisible =
-                                    logo && !failedAddonLogos.includes(logo);
-
-                                const rowBody = (
-                                    <>
-                                        <span className="game-addon-logo">
-                                            {logoVisible ? (
-                                                <img
-                                                    src={logo}
-                                                    alt=""
-                                                    loading="lazy"
-                                                    onError={() =>
-                                                        setFailedAddonLogos(
-                                                            (current) =>
-                                                                current.includes(
-                                                                    logo
-                                                                )
-                                                                    ? current
-                                                                    : [
-                                                                          ...current,
-                                                                          logo,
-                                                                      ]
-                                                        )
-                                                    }
-                                                />
-                                            ) : (
-                                                <span
-                                                    className="game-addon-initials"
-                                                    aria-hidden="true"
-                                                >
-                                                    {addonInitials(addon.name)}
-                                                </span>
-                                            )}
-                                        </span>
-
-                                        <span className="game-addon-body">
-                                            <span className="game-addon-title">
-                                                <strong>{addon.name}</strong>
-                                                {type && (
-                                                    <span className="game-addon-type">
-                                                        {type}
-                                                    </span>
-                                                )}
-                                            </span>
-                                            {description && (
-                                                <span className="game-addon-description">
-                                                    {description}
-                                                </span>
-                                            )}
-                                        </span>
-
-                                        {size && (
-                                            <span className="game-addon-size">
-                                                {size}
-                                            </span>
-                                        )}
-
-                                        {link && (
-                                            <span className="game-addon-open">
-                                                <FontAwesomeIcon
-                                                    icon={
-                                                        faDownload
-                                                    }
-                                                />
-                                            </span>
-                                        )}
-                                    </>
-                                );
-
-                                return (
-                                    <li key={`${addon.name}-${index}`}>
-                                        {link ? (
-                                            <a
-                                                className="game-addon"
-                                                href={link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                aria-label={`Open ${addon.name}${type ? ` (${type})` : ""}`}
-                                            >
-                                                {rowBody}
-                                            </a>
-                                        ) : (
-                                            <div className="game-addon is-static">
-                                                {rowBody}
-                                            </div>
-                                        )}
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </section>
+                <AddonsPanel addons={addons} />
             ) : (
                 <GameReviews slug={game.slug} title={game.title} />
             )}
