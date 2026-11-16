@@ -73,7 +73,7 @@ const navigation = [
         requiresAuth: true,
         requiresAdmin: true,
       },
-      { label: "Support", to: "/support", icon: faHeadset },
+      { label: "Support tickets", to: "/support", icon: faHeadset },
     ],
   },
 ];
