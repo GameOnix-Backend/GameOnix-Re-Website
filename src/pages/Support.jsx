@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faCheck, faLock, faPaperPlane, faPlus, faRotateRight, faTicket } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCheck, faChevronDown, faCircleQuestion, faGift, faLock, faPaperPlane, faPlus, faReceipt, faRotateRight, faTicket, faUserShield, faWallet } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { useAuth } from "../context/AuthContext";
 import { getCommunityApiToken } from "../api/session";
@@ -15,12 +15,107 @@ const MAX_MESSAGE_LENGTH = 1500;
 const MAX_REPLY_LENGTH = 2000;
 const MIN_MESSAGE_LENGTH = 10;
 const TOPICS = [
-  { value: "order", label: "Order or purchase" },
-  { value: "gift-card", label: "Gift card code" },
-  { value: "wallet", label: "Wallet top-up" },
-  { value: "account", label: "Account access" },
-  { value: "other", label: "Something else" },
+  { value: "order", label: "Order or purchase", hint: "Payment, delivery, or order status", icon: faReceipt },
+  { value: "gift-card", label: "Gift card code", hint: "A code did not work or arrive", icon: faGift },
+  { value: "wallet", label: "Wallet top-up", hint: "Balance, deposit, or payment", icon: faWallet },
+  { value: "account", label: "Account access", hint: "Sign-in or profile help", icon: faUserShield },
+  { value: "other", label: "Something else", hint: "Any other question", icon: faCircleQuestion },
 ];
+
+function TopicDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(Math.max(0, TOPICS.findIndex((item) => item.value === value)));
+  const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const optionRefs = useRef([]);
+  const listboxId = "support-topic-options-" + useId().replace(/:/g, "");
+  const selectedIndex = Math.max(0, TOPICS.findIndex((item) => item.value === value));
+  const selected = TOPICS[selectedIndex];
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function onPointerDown(event) {
+      if (!rootRef.current?.contains(event.target)) setOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  function openAt(index = selectedIndex) {
+    const next = (index + TOPICS.length) % TOPICS.length;
+    setActiveIndex(next);
+    setOpen(true);
+    requestAnimationFrame(() => optionRefs.current[next]?.focus());
+  }
+
+  function moveFocus(index) {
+    const next = (index + TOPICS.length) % TOPICS.length;
+    setActiveIndex(next);
+    optionRefs.current[next]?.focus();
+  }
+
+  function handleTriggerKeyDown(event) {
+    if (["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) {
+      event.preventDefault();
+      if (!open) openAt(event.key === "ArrowUp" ? selectedIndex - 1 : selectedIndex);
+    }
+  }
+
+  function handleOptionKeyDown(event, index) {
+    if (event.key === "ArrowDown") { event.preventDefault(); moveFocus(index + 1); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); moveFocus(index - 1); }
+    else if (event.key === "Home") { event.preventDefault(); moveFocus(0); }
+    else if (event.key === "End") { event.preventDefault(); moveFocus(TOPICS.length - 1); }
+    else if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
+    else if (event.key === "Tab") setOpen(false);
+  }
+
+  return (
+    <div className="support-topic-picker" ref={rootRef}>
+      <span className="support-topic-label">Topic</span>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="support-topic-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={listboxId}
+        onClick={() => open ? setOpen(false) : openAt()}
+        onKeyDown={handleTriggerKeyDown}
+      >
+        <span className={"support-topic-icon is-" + selected.value}><FontAwesomeIcon icon={selected.icon} /></span>
+        <span className="support-topic-copy"><strong>{selected.label}</strong><small>{selected.hint}</small></span>
+        <FontAwesomeIcon className="support-topic-chevron" icon={faChevronDown} />
+      </button>
+      {open && (
+        <div className="support-topic-menu" id={listboxId} role="listbox" aria-label="Support topic">
+          {TOPICS.map((option, index) => (
+            <button
+              key={option.value}
+              ref={(element) => { optionRefs.current[index] = element; }}
+              type="button"
+              role="option"
+              aria-selected={option.value === value}
+              tabIndex={activeIndex === index ? 0 : -1}
+              className={"support-topic-option" + (option.value === value ? " is-selected" : "")}
+              onFocus={() => setActiveIndex(index)}
+              onKeyDown={(event) => handleOptionKeyDown(event, index)}
+              onClick={() => { onChange(option.value); setOpen(false); triggerRef.current?.focus(); }}
+            >
+              <span className={"support-topic-icon is-" + option.value}><FontAwesomeIcon icon={option.icon} /></span>
+              <span className="support-topic-copy"><strong>{option.label}</strong><small>{option.hint}</small></span>
+              {option.value === value && <FontAwesomeIcon className="support-topic-check" icon={faCheck} />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function getTopicLabel(ticket) {
   const details = ticket.details || {};
@@ -222,7 +317,7 @@ export default function Support() {
                   <div className="support-ticket-new">
                     <div className="support-ticket-detail-heading"><div><span>NEW CONVERSATION</span><h2>Open a ticket</h2></div><button type="button" onClick={() => { setShowNewTicket(false); setTicketError(""); }}>Cancel</button></div>
                     <form className="support-form" onSubmit={handleSubmit} noValidate>
-                      <div className="support-field"><label htmlFor="support-topic">Topic</label><select id="support-topic" value={topic} onChange={(event) => setTopic(event.target.value)}>{TOPICS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
+                      <TopicDropdown value={topic} onChange={setTopic} />
                       <div className="support-field"><label htmlFor="support-order-id">Order ID <span>(optional)</span></label><input id="support-order-id" value={orderId} maxLength={60} autoComplete="off" onChange={(event) => setOrderId(event.target.value)} placeholder="Paste the request ID from My Orders" /></div>
                       <div className="support-field"><label htmlFor="support-email">Account email</label><input id="support-email" type="email" value={user.email || ""} readOnly /></div>
                       <div className="support-field"><label htmlFor="support-message">How can we help?</label><textarea id="support-message" rows={5} maxLength={MAX_MESSAGE_LENGTH} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Describe the issue and what you expected." /><span className="support-char-count">{message.length} / {MAX_MESSAGE_LENGTH}</span></div>
