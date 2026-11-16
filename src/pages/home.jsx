@@ -15,6 +15,11 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import GameCard from "../components/GameCard";
 import { getGameCategories } from "../utils/game-categories";
+import {
+  getGameBadgeType,
+  getGameReleaseTimestamp,
+  isUpdatedGame,
+} from "../utils/game-release";
 
 import "./../style/home-style.css";
 
@@ -22,8 +27,6 @@ const GAMES_DATA_URL =
   "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
 
 const GAMES_PER_SECTION = 20;
-const NEW_BADGE_DURATION = 24 * 60 * 60 * 1000;
-
 function getAddedAt(game) {
   const value = game?.createdAt;
 
@@ -32,18 +35,6 @@ function getAddedAt(game) {
   const timestamp = Date.parse(value);
 
   return Number.isFinite(timestamp) ? timestamp : null;
-}
-
-function getGameBadgeType(game, now = Date.now()) {
-  const addedAt = getAddedAt(game);
-
-  const isRecent =
-    addedAt !== null &&
-    addedAt <= now &&
-    now - addedAt < NEW_BADGE_DURATION;
-
-  if (!isRecent) return "";
-  return game?.releaseType === "update" ? "UPDATE" : "NEW";
 }
 
 function getGameList(data) {
@@ -129,15 +120,19 @@ function GamesCarousel({ games, platform, category, now }) {
   const visibleGames = games.slice(0, GAMES_PER_SECTION);
   const hasMore = games.length > GAMES_PER_SECTION;
   const isRecentlyAdded = category.id === "recently-added";
+  const isRecentlyUpdated = category.id === "recently-updated";
+  const isReleaseSection = isRecentlyAdded || isRecentlyUpdated;
 
-  const categoryUrl = isRecentlyAdded
-    ? "/games?sort=recent"
+  const categoryUrl = isReleaseSection
+    ? `/games?sort=${isRecentlyUpdated ? "updated" : "recent"}`
     : `/games?platform=${encodeURIComponent(
         platform.id
       )}&type=${encodeURIComponent(category.type)}`;
 
   const title = isRecentlyAdded
     ? "Recently Added"
+    : isRecentlyUpdated
+      ? "Recently Updated"
     : category.type;
 
   function scrollRow(direction) {
@@ -154,13 +149,13 @@ function GamesCarousel({ games, platform, category, now }) {
   return (
     <section
       className={
-        isRecentlyAdded
+        isReleaseSection
           ? "home-category home-recently-added"
           : "home-category"
       }
     >
       <header className="home-category-heading">
-        {isRecentlyAdded ? (
+        {isReleaseSection ? (
           <div className="home-category-title home-category-title-static">
             <span className="home-category-accent" />
             <span>{title}</span>
@@ -185,7 +180,7 @@ function GamesCarousel({ games, platform, category, now }) {
             className="home-category-more"
             to={categoryUrl}
           >
-            {isRecentlyAdded ? "View all" : "More"}
+            {isReleaseSection ? "View all" : "More"}
             <FontAwesomeIcon icon={faChevronRight} />
           </Link>
 
@@ -295,9 +290,21 @@ function Home() {
 
   const recentlyAddedGames = useMemo(() => {
     return games
-      .filter((game) => getAddedAt(game) !== null)
+      .filter((game) => !isUpdatedGame(game) && getAddedAt(game) !== null)
       .slice()
       .sort(compareGameIdsDescending);
+  }, [games]);
+
+  const recentlyUpdatedGames = useMemo(() => {
+    return games
+      .filter(
+        (game) => isUpdatedGame(game) && getGameReleaseTimestamp(game) !== null
+      )
+      .slice()
+      .sort((first, second) =>
+        (getGameReleaseTimestamp(second) || 0) -
+        (getGameReleaseTimestamp(first) || 0)
+      );
   }, [games]);
 
   const sections = useMemo(() => {
@@ -373,6 +380,10 @@ function Home() {
     id: "recently-added",
     type: "Recently Added",
   };
+  const updatedCategory = {
+    id: "recently-updated",
+    type: "Recently Updated",
+  };
 
   return (
     <main className="home-page">
@@ -407,6 +418,15 @@ function Home() {
           games={recentlyAddedGames}
           platform={null}
           category={recentCategory}
+          now={clock}
+        />
+      )}
+
+      {recentlyUpdatedGames.length > 0 && (
+        <GamesCarousel
+          games={recentlyUpdatedGames}
+          platform={null}
+          category={updatedCategory}
           now={clock}
         />
       )}

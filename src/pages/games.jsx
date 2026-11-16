@@ -8,14 +8,17 @@ import {
   faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
+import {
+  getGameBadgeType,
+  getGameReleaseTimestamp,
+  isUpdatedGame,
+} from "../utils/game-release";
 
 import "./../style/games-style.css";
 import { gameHasCategory } from "../utils/game-categories";
 
 const GAMES_DATA_URL =
   "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
-
-const NEW_BADGE_DURATION = 24 * 60 * 60 * 1000;
 
 function getGameList(data) {
   if (Array.isArray(data)) return data;
@@ -32,28 +35,13 @@ function normalizePlatform(value) {
   return platform;
 }
 
-function getGameBadgeType(game) {
-  const value = game?.createdAt;
-
-  if (!value || typeof value !== "string") return "";
-
-  const timestamp = Date.parse(value);
-  const now = Date.now();
-
-  const isRecent =
-    Number.isFinite(timestamp) &&
-    timestamp <= now &&
-    now - timestamp < NEW_BADGE_DURATION;
-
-  if (!isRecent) return "";
-  return game?.releaseType === "update" ? "UPDATE" : "NEW";
-}
-
 function Games() {
   const [searchParams] = useSearchParams();
 
   const platform = normalizePlatform(searchParams.get("platform"));
   const type = searchParams.get("type") || "";
+  const sort = searchParams.get("sort") || "";
+  const now = Date.now();
 
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +86,7 @@ function Games() {
   }, []);
 
   const filteredGames = useMemo(() => {
-    return games.filter((game) => {
+    const matchingGames = games.filter((game) => {
       const matchesPlatform =
         !platform || normalizePlatform(game.platform) === platform;
 
@@ -106,9 +94,24 @@ function Games() {
         !type ||
         gameHasCategory(game, type.trim());
 
-      return matchesPlatform && matchesType;
+      const releaseTimestamp = getGameReleaseTimestamp(game);
+      const matchesRelease =
+        sort === "recent"
+          ? !isUpdatedGame(game) && releaseTimestamp !== null
+          : sort === "updated"
+            ? isUpdatedGame(game) && releaseTimestamp !== null
+            : true;
+
+      return matchesPlatform && matchesType && matchesRelease;
     });
-  }, [games, platform, type]);
+    if (sort === "recent" || sort === "updated") {
+      matchingGames.sort((first, second) =>
+        (getGameReleaseTimestamp(second) || 0) -
+        (getGameReleaseTimestamp(first) || 0)
+      );
+    }
+    return matchingGames;
+  }, [games, platform, type, sort]);
 
   const platformTitle =
     platform === "pc"
@@ -117,7 +120,11 @@ function Games() {
         ? "PlayStation Games"
         : "All Games";
 
-  const pageTitle = type ? `${type} Games` : platformTitle;
+  const pageTitle = sort === "updated"
+    ? "Recently Updated Games"
+    : sort === "recent"
+      ? "Recently Added Games"
+      : type ? `${type} Games` : platformTitle;
 
   if (loading) {
     return (
@@ -180,7 +187,7 @@ function Games() {
             <GameCard
               key={game.slug}
               game={game}
-              badgeType={getGameBadgeType(game)}
+              badgeType={getGameBadgeType(game, now)}
             />
           ))}
         </div>
