@@ -103,6 +103,8 @@ function Notifications() {
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
+  const [supportReplyDrafts, setSupportReplyDrafts] = useState({});
+  const [supportReplyBusy, setSupportReplyBusy] = useState("");
   const [filter, setFilter] = useState("all");
   const [codesByOrder, setCodesByOrder] = useState({});
   const [codesLoading, setCodesLoading] = useState(false);
@@ -295,6 +297,22 @@ function Notifications() {
       );
       notifyNotificationCountChanged();
     }
+  }
+
+  async function sendSupportMessage(reportId) {
+    const message = String(supportReplyDrafts[reportId] || "").trim();
+    if (!message || supportReplyBusy) return;
+    setSupportReplyBusy(reportId);
+    const result = await updateNotifications("POST", {
+      action: "reply-support-thread",
+      notificationId: reportId,
+      message,
+    });
+    if (result) {
+      setSupportReplyDrafts((current) => ({ ...current, [reportId]: "" }));
+      await loadNotifications();
+    }
+    setSupportReplyBusy("");
   }
 
   async function markAllRead() {
@@ -534,6 +552,37 @@ function Notifications() {
                           <strong>{row.value}</strong>
                         </div>
                       ))}
+                      {["support_request", "bug_report"].includes(notification.type) && (
+                        <section className="notification-conversation" aria-label="Support conversation">
+                          <h3>Conversation</h3>
+                          {(() => {
+                            const messages = Array.isArray(details.messages) && details.messages.length
+                              ? details.messages
+                              : [{ id: notification.id, author: "user", username: user.username, message: String(details.message || details.description || ""), createdAt: notification.createdAt }];
+                            return <div className="notification-conversation-messages">
+                              {messages.map((item) => (
+                                <article className={"notification-chat-message" + (item.author === "admin" ? " from-team" : "")} key={item.id}>
+                                  <span>{item.author === "admin" ? "GameOnix team" : "You"} · {new Date(item.createdAt).toLocaleString()}</span>
+                                  <p>{item.message}</p>
+                                </article>
+                              ))}
+                            </div>;
+                          })()}
+                          <form onSubmit={(event) => { event.preventDefault(); void sendSupportMessage(notification.id); }}>
+                            <textarea
+                              rows={2}
+                              maxLength={2000}
+                              value={supportReplyDrafts[notification.id] || ""}
+                              onChange={(event) => setSupportReplyDrafts((current) => ({ ...current, [notification.id]: event.target.value }))}
+                              placeholder="Write a message to support..."
+                              aria-label="Reply to support"
+                            />
+                            <button type="submit" disabled={supportReplyBusy === notification.id || !String(supportReplyDrafts[notification.id] || "").trim()}>
+                              {supportReplyBusy === notification.id ? "Sending..." : "Send"}
+                            </button>
+                          </form>
+                        </section>
+                      )}
                       {giftCardCodes.length > 0 && (
                         <section className="notifications-codes">
                           <h3>

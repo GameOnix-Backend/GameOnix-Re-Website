@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { getReviews, saveReview } from "../api/session";
+import { getReviews, saveReview, saveReviewReply } from "../api/session";
 import { useAuth } from "../context/AuthContext";
 import "./../style/reviews-style.css";
 
@@ -25,6 +25,9 @@ function ReviewSection({ target, gameSlug, gameTitle }) {
   const [commentDraft, setCommentDraft] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [replyDrafts, setReplyDrafts] = useState({});
+  const [replyingId, setReplyingId] = useState("");
+  const [replyError, setReplyError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -102,6 +105,26 @@ function ReviewSection({ target, gameSlug, gameTitle }) {
     }
   }
 
+  async function submitReply(event, review) {
+    event.preventDefault();
+    if (!user || replyingId) return;
+    const reply = String(replyDrafts[review.id] || "").trim();
+    if (!reply) return;
+    setReplyingId(review.id);
+    setReplyError("");
+    try {
+      const result = await saveReviewReply(review.id, reply);
+      setReviews((current) => current.map((item) =>
+        item.id === review.id ? result.review : item
+      ));
+      setReplyDrafts((current) => ({ ...current, [review.id]: "" }));
+    } catch (error) {
+      setReplyError(error.message || "Unable to post your reply.");
+    } finally {
+      setReplyingId("");
+    }
+  }
+
   return (
     <section className="reviews-section">
       <div className="reviews-summary">
@@ -171,6 +194,7 @@ function ReviewSection({ target, gameSlug, gameTitle }) {
       )}
 
       {error && <p className="review-error" role="alert">{error}</p>}
+      {replyError && <p className="review-error" role="alert">{replyError}</p>}
 
       {loading ? (
         <div className="reviews-state">Loading reviews…</div>
@@ -203,6 +227,27 @@ function ReviewSection({ target, gameSlug, gameTitle }) {
                   <p>{review.adminReply}</p>
                 </div>
               )}
+              {(Array.isArray(review.replies) ? review.replies : []).map((reply) => (
+                <div className="review-community-reply" key={reply.id}>
+                  <strong>@{reply.username}</strong>
+                  <p>{reply.comment}</p>
+                </div>
+              ))}
+              {user ? (
+                <form className="review-reply-form" onSubmit={(event) => void submitReply(event, review)}>
+                  <textarea
+                    rows={2}
+                    maxLength={600}
+                    value={replyDrafts[review.id] || ""}
+                    onChange={(event) => setReplyDrafts((current) => ({ ...current, [review.id]: event.target.value }))}
+                    placeholder={"Reply to @" + (review.username || "user") + "..."}
+                    aria-label={"Reply to review by " + (review.username || "user")}
+                  />
+                  <button type="submit" disabled={replyingId === review.id || !String(replyDrafts[review.id] || "").trim()}>
+                    {replyingId === review.id ? "Sending..." : "Reply"}
+                  </button>
+                </form>
+              ) : null}
             </article>
           ))}
         </div>

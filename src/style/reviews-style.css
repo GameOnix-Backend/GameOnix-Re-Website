@@ -322,3 +322,46 @@
     flex-wrap: wrap;
   }
 }
+
+.review-community-reply {
+  margin: 10px 0 0 18px;
+  padding: 10px 12px;
+  border-left: 2px solid #514673;
+  border-radius: 0 8px 8px 0;
+  background: var(--bg-primary, #101014);
+}
+.review-community-reply strong { color: #c4b5fd; font-size: 11px; }
+.review-community-reply p { margin: 5px 0 0; }
+.review-reply-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 12px 0 0 18px;
+}
+.review-reply-form textarea {
+  min-width: 0;
+  flex: 1;
+  resize: vertical;
+  border: 1px solid var(--border, #303038);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: var(--text-primary, #f5f5f7);
+  font: inherit;
+  font-size: 12px;
+  background: var(--bg-primary, #101014);
+}
+.review-reply-form textarea:focus { outline: 2px solid rgb(141 112 255 / 45%); }
+.review-reply-form button {
+  min-height: 36px;
+  border: 1px solid #6f5bc7;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: white;
+  background: #6d57c6;
+  cursor: pointer;
+}
+.review-reply-form button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 480px) {
+  .review-reply-form { align-items: stretch; flex-direction: column; margin-left: 0; }
+  .review-reply-form button { align-self: flex-end; }
+}

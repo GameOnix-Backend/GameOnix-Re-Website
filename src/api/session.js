@@ -5,7 +5,7 @@ const COMMUNITY_AUTH_ME_URL =
 // Vercel Hobby plan limits a deployment to 12 serverless functions.
 const REVIEWS_API_URL =
   import.meta.env.VITE_REVIEWS_API_URL ||
-  "https://gameonix-backend.vercel.app/api/auth/me?reviews=public";
+  "https://gameonix-backend.vercel.app/api/auth/comments";
 
 export async function getCommunityApiToken() {
   const response = await fetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {
@@ -56,6 +56,24 @@ export async function saveReview(review) {
   }
 
   return data.review;
+}
+
+export async function saveReviewReply(reviewId, reply) {
+  const token = await getCommunityApiToken();
+  const response = await fetch(REVIEWS_API_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({ action: "reply", reviewId, reply }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.review) {
+    throw new Error(data.error || "Unable to post your reply.");
+  }
+  return data;
 }
 
 export function getSessionToken() {
