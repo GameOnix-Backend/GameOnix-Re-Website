@@ -29,6 +29,7 @@ import {
 import { getCommunityApiToken } from "../api/session";
 import { useAuth } from "../context/AuthContext";
 import AddonsPanel from "../components/AddonsPanel";
+import GameCard from "../components/GameCard";
 import { getGameCategories } from "../utils/game-categories";
 import { getAddonList } from "../utils/addons";
 import { GameReviews } from "./reviews";
@@ -68,6 +69,7 @@ function GameDetails() {
     const reportDescriptionRef = useRef(null);
 
     const [game, setGame] = useState(null);
+    const [allGames, setAllGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -123,9 +125,9 @@ function GameDetails() {
 
                 const data = await response.json();
 
-                const found = getGameList(data).find(
-                    (item) => item.slug === slug
-                );
+                const gameList = getGameList(data);
+                setAllGames(gameList);
+                const found = gameList.find((item) => item.slug === slug);
 
                 if (!found) {
                     throw new Error("Game not found.");
@@ -379,6 +381,19 @@ function GameDetails() {
 
     const isFavorite = favorites.includes(game.slug);
     const addons = getAddonList(game.addons);
+    const currentCategories = new Set(getGameCategories(game).map((category) => category.toLocaleLowerCase()));
+    const relatedGames = allGames
+        .filter((candidate) => candidate.slug !== game.slug && candidate.availability !== false)
+        .map((candidate) => {
+            const sharedCategories = getGameCategories(candidate)
+                .filter((category) => currentCategories.has(category.toLocaleLowerCase())).length;
+            const samePlatform = String(candidate.platform || "").toLocaleLowerCase() === String(game.platform || "").toLocaleLowerCase();
+            return { candidate, score: sharedCategories * 2 + Number(samePlatform) };
+        })
+        .filter((item) => item.score > 0)
+        .sort((first, second) => second.score - first.score || Number(second.candidate.id || 0) - Number(first.candidate.id || 0))
+        .slice(0, 4)
+        .map((item) => item.candidate);
 
     return (
         <>
@@ -639,6 +654,22 @@ function GameDetails() {
                                 </span>
                                 <strong>{game.publisher || "N/A"}</strong>
                             </div>
+                            <div>
+                                <span>Download type</span>
+                                <strong>{game.fileType ? String(game.fileType).replace(/^\w/, (letter) => letter.toUpperCase()) : "Torrent"}</strong>
+                            </div>
+
+                            <div>
+                                <span>Availability</span>
+                                <strong className={game.availability === false ? "game-availability-unavailable" : "game-availability-available"}>
+                                    {game.availability === false ? "Currently unavailable" : "Available to download"}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Date added</span>
+                                <strong>{game.createdAt && Number.isFinite(Date.parse(game.createdAt)) ? new Date(game.createdAt).toLocaleDateString() : "N/A"}</strong>
+                            </div>
                         </div>
 
                         <div className="game-actions-row">
@@ -737,6 +768,22 @@ function GameDetails() {
                 <AddonsPanel addons={addons} />
             ) : (
                 <GameReviews slug={game.slug} title={game.title} />
+            )}
+            {relatedGames.length > 0 && (
+                <section className="game-related-section" aria-labelledby="game-related-title">
+                    <div className="game-related-heading">
+                        <div>
+                            <span>KEEP EXPLORING</span>
+                            <h2 id="game-related-title">More like this</h2>
+                        </div>
+                        <p>Games with similar genres and platforms</p>
+                    </div>
+                    <div className="game-related-grid">
+                        {relatedGames.map((relatedGame) => (
+                            <GameCard key={relatedGame.slug} game={relatedGame} />
+                        ))}
+                    </div>
+                </section>
             )}
         </main>
         {reportOpen &&

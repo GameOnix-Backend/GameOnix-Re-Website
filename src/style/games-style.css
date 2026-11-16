@@ -213,3 +213,46 @@
     letter-spacing: 0.8px;
     box-shadow: 0 3px 12px rgba(255, 77, 141, 0.3);
 }
+
+.games-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto auto;
+    align-items: end;
+    gap: 12px;
+    margin: 0 0 24px;
+}
+.games-search,
+.games-filter-control {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9px;
+    padding: 0 12px;
+    color: #9b8bd5;
+    background: #15151e;
+}
+.games-search:focus-within,
+.games-filter-control:focus-within { border-color: rgba(169, 148, 255, 0.65); }
+.games-search input,
+.games-filter-control select {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    color: #f2f0fa;
+    font: inherit;
+    background: transparent;
+}
+.games-search input::placeholder { color: #888493; }
+.games-filter-control { gap: 8px; }
+.games-filter-control span { color: #908a9e; font-size: 0.72rem; white-space: nowrap; }
+.games-filter-control select { cursor: pointer; }
+.games-filter-control option { color: #f2f0fa; background: #15151e; }
+@media (max-width: 680px) {
+    .games-toolbar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .games-search { grid-column: 1 / -1; }
+    .games-filter-control { padding-inline: 9px; }
+}

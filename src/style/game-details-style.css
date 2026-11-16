@@ -1037,3 +1037,15 @@
         transform: translateY(0);
     }
 }
+
+
+.game-availability-available { color: #8ee0bc !important; }
+.game-availability-unavailable { color: #f0a3ab !important; }
+.game-related-section { margin: 36px 0 12px; border-top: 1px solid var(--game-border); padding-top: 24px; }
+.game-related-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.game-related-heading > div > span { color: var(--game-muted); font-size: 9px; font-weight: 800; letter-spacing: 1.2px; }
+.game-related-heading h2 { margin: 5px 0 0; color: var(--game-text); font-size: 20px; }
+.game-related-heading p { margin: 0; color: var(--game-muted); font-size: 11px; }
+.game-related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 850px) { .game-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .game-related-heading { align-items: flex-start; flex-direction: column; } .game-related-grid { gap: 10px; } }

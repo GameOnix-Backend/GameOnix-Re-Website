@@ -6,6 +6,7 @@ import {
   faChevronLeft,
   faGamepad,
   faRotate,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
 import {
@@ -15,7 +16,7 @@ import {
 } from "../utils/game-release";
 
 import "./../style/games-style.css";
-import { gameHasCategory } from "../utils/game-categories";
+import { gameHasCategory, getGameCategories } from "../utils/game-categories";
 
 const GAMES_DATA_URL =
   "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
@@ -46,6 +47,9 @@ function Games() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [order, setOrder] = useState("recent");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -86,14 +90,12 @@ function Games() {
   }, []);
 
   const filteredGames = useMemo(() => {
+    const needle = search.trim().toLocaleLowerCase();
     const matchingGames = games.filter((game) => {
       const matchesPlatform =
         !platform || normalizePlatform(game.platform) === platform;
-
       const matchesType =
-        !type ||
-        gameHasCategory(game, type.trim());
-
+        !type || gameHasCategory(game, type.trim());
       const releaseTimestamp = getGameReleaseTimestamp(game);
       const matchesRelease =
         sort === "recent"
@@ -101,17 +103,32 @@ function Games() {
           : sort === "updated"
             ? isUpdatedGame(game) && releaseTimestamp !== null
             : true;
-
-      return matchesPlatform && matchesType && matchesRelease;
+      const matchesAvailability =
+        availabilityFilter === "all" ||
+        (availabilityFilter === "available"
+          ? game.availability !== false
+          : game.availability === false);
+      const searchableText = [
+        game.title,
+        game.publisher,
+        game.platform,
+        ...getGameCategories(game),
+        game.gameType,
+      ].join(" ").toLocaleLowerCase();
+      const matchesSearch = !needle || searchableText.includes(needle);
+      return matchesPlatform && matchesType && matchesRelease && matchesAvailability && matchesSearch;
     });
-    if (sort === "recent" || sort === "updated") {
-      matchingGames.sort((first, second) =>
-        (getGameReleaseTimestamp(second) || 0) -
-        (getGameReleaseTimestamp(first) || 0)
-      );
-    }
+
+    matchingGames.sort((first, second) => {
+      if (order === "title") return String(first.title || "").localeCompare(String(second.title || ""));
+      const firstDate = getGameReleaseTimestamp(first);
+      const secondDate = getGameReleaseTimestamp(second);
+      return firstDate !== null && secondDate !== null
+        ? secondDate - firstDate
+        : Number(second.id || 0) - Number(first.id || 0);
+    });
     return matchingGames;
-  }, [games, platform, type, sort]);
+  }, [availabilityFilter, games, order, platform, search, sort, type]);
 
   const platformTitle =
     platform === "pc"
@@ -174,11 +191,39 @@ function Games() {
         </p>
       </header>
 
+      <div className="games-toolbar" role="search">
+        <label className="games-search">
+          <FontAwesomeIcon icon={faSearch} aria-hidden="true" />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search games, publishers, platforms..."
+            aria-label="Search games"
+          />
+        </label>
+        <label className="games-filter-control">
+          <span>Availability</span>
+          <select value={availabilityFilter} onChange={(event) => setAvailabilityFilter(event.target.value)} aria-label="Filter by availability">
+            <option value="all">All games</option>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+        </label>
+        <label className="games-filter-control">
+          <span>Sort</span>
+          <select value={order} onChange={(event) => setOrder(event.target.value)} aria-label="Sort games">
+            <option value="recent">Recently added</option>
+            <option value="title">Name A–Z</option>
+          </select>
+        </label>
+      </div>
+
       {filteredGames.length === 0 ? (
         <div className="games-empty">
           <FontAwesomeIcon icon={faGamepad} />
-          <h2>No games found</h2>
-          <p>There are no games matching this category yet.</p>
+          <h2>{search || availabilityFilter !== "all" ? "No matching games" : "No games found"}</h2>
+          <p>{search || availabilityFilter !== "all" ? "Try changing your search or filters." : "There are no games matching this category yet."}</p>
           <Link to="/">Back to Home</Link>
         </div>
       ) : (
