@@ -125,7 +125,7 @@ function getTopicLabel(ticket) {
 
 function getTicketMessages(ticket) {
   const details = ticket.details || {};
-  if (Array.isArray(details.messages) && details.messages.length) return details.messages;
+  if (Array.isArray(details.messages)) return details.messages;
   return [{
     id: ticket.id,
     author: "user",
@@ -157,6 +157,10 @@ export default function Support() {
   const [replyDraft, setReplyDraft] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sendingReply, setSendingReply] = useState(false);
+  const [canManageSupport, setCanManageSupport] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState("");
+  const [editingMessageDraft, setEditingMessageDraft] = useState("");
+  const [messageActionId, setMessageActionId] = useState("");
 
   const loadTickets = useCallback(async ({ selectNewest = false, showSpinner = false } = {}) => {
     if (!user) return [];
@@ -176,6 +180,7 @@ export default function Support() {
         .filter((item) => ["support_request", "bug_report"].includes(item.type))
         .sort((a, b) => Date.parse(b.createdAt || "") - Date.parse(a.createdAt || ""));
       setTickets(nextTickets);
+      setCanManageSupport(data.canSend === true);
       setActiveTicketId((current) => {
         if (selectNewest && nextTickets[0]) return nextTickets[0].id;
         if (current && nextTickets.some((ticket) => ticket.id === current)) return current;
@@ -228,7 +233,7 @@ export default function Support() {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: "Bearer " + token },
         credentials: "omit",
-        body: JSON.stringify({ topic, orderId: orderId.trim(), message: trimmedMessage, website: honeypot }),
+        body: JSON.stringify({ topic, orderId: topic === "order" ? orderId.trim() : "", message: trimmedMessage, website: honeypot }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Couldn't create your ticket. Please try again.");
@@ -242,6 +247,36 @@ export default function Support() {
       setTicketError(error.message || "Couldn't create your ticket. Please try again.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function moderateTicketMessage(action, ticketId, messageId, text = "") {
+    if (!ticketId || !messageId || messageActionId) return;
+    if (action === "delete" && !window.confirm("Delete this message? It will be removed from the conversation.")) return;
+    setMessageActionId(messageId);
+    setTicketError("");
+    try {
+      const token = await getCommunityApiToken();
+      const response = await fetch(TICKETS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: "Bearer " + token },
+        credentials: "omit",
+        body: JSON.stringify({
+          action: action === "edit" ? "edit-support-message" : "delete-support-message",
+          notificationId: ticketId,
+          messageId,
+          message: text,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "This message could not be updated.");
+      setEditingMessageId("");
+      setEditingMessageDraft("");
+      await loadTickets();
+    } catch (error) {
+      setTicketError(error.message || "This message could not be updated.");
+    } finally {
+      setMessageActionId("");
     }
   }
 
@@ -305,7 +340,7 @@ export default function Support() {
                   const status = getTicketStatus(ticket);
                   return <button type="button" className={"support-ticket-item" + (ticket.id === activeTicketId && !showNewTicket ? " is-active" : "")} key={ticket.id} onClick={() => { setActiveTicketId(ticket.id); setShowNewTicket(false); setTicketError(""); }}>
                     <span className="support-ticket-item-top"><strong>{getTopicLabel(ticket)}</strong><i className={"support-ticket-status is-" + status}>{status}</i></span>
-                    <span>{String(ticket.details?.message || ticket.details?.description || ticket.message || "").slice(0, 90)}</span>
+                    <span>{(Array.isArray(ticket.details?.messages) ? String(ticket.details.messages.at(-1)?.message || "No messages yet") : String(ticket.details?.message || ticket.details?.description || ticket.message || "No message")).slice(0, 90)}</span>
                     <small>#{ticket.id.slice(0, 8)} · {new Date(ticket.createdAt).toLocaleDateString()}</small>
                   </button>;
                 }) : <div className="support-ticket-list-state"><FontAwesomeIcon icon={faTicket} /><span>No tickets yet.</span></div>}
@@ -317,8 +352,8 @@ export default function Support() {
                   <div className="support-ticket-new">
                     <div className="support-ticket-detail-heading"><div><span>NEW CONVERSATION</span><h2>Open a ticket</h2></div><button type="button" onClick={() => { setShowNewTicket(false); setTicketError(""); }}>Cancel</button></div>
                     <form className="support-form" onSubmit={handleSubmit} noValidate>
-                      <TopicDropdown value={topic} onChange={setTopic} />
-                      <div className="support-field"><label htmlFor="support-order-id">Order ID <span>(optional)</span></label><input id="support-order-id" value={orderId} maxLength={60} autoComplete="off" onChange={(event) => setOrderId(event.target.value)} placeholder="Paste the request ID from My Orders" /></div>
+                      <TopicDropdown value={topic} onChange={(value) => { setTopic(value); if (value !== "order") setOrderId(""); }} />
+                      {topic === "order" && <div className="support-field"><label htmlFor="support-order-id">Order ID <span>(optional)</span></label><input id="support-order-id" value={orderId} maxLength={60} autoComplete="off" onChange={(event) => setOrderId(event.target.value)} placeholder="Paste the request ID from My Orders" /></div>}
                       <div className="support-field"><label htmlFor="support-email">Account email</label><input id="support-email" type="email" value={user.email || ""} readOnly /></div>
                       <div className="support-field"><label htmlFor="support-message">How can we help?</label><textarea id="support-message" rows={5} maxLength={MAX_MESSAGE_LENGTH} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Describe the issue and what you expected." /><span className="support-char-count">{message.length} / {MAX_MESSAGE_LENGTH}</span></div>
                       <input type="text" name="website" className="support-honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" />
@@ -332,9 +367,25 @@ export default function Support() {
                       <i className={"support-ticket-status is-" + getTicketStatus(activeTicket)}>{getTicketStatus(activeTicket)}</i>
                     </header>
                     <div className="support-ticket-messages">
-                      {getTicketMessages(activeTicket).map((item) => <article className={"support-ticket-message" + (item.author === "admin" ? " from-team" : "")} key={item.id}>
-                        <span>{item.author === "admin" ? "GameOnix support" : "You"} · {item.createdAt ? new Date(item.createdAt).toLocaleString() : "Just now"}</span><p>{item.message}</p>
-                      </article>)}
+                      {getTicketMessages(activeTicket).length === 0 && <p className="support-ticket-no-messages">No messages in this ticket.</p>}
+                      {getTicketMessages(activeTicket).map((item) => {
+                        const mine = String(item.username || activeTicket.username || "").toLowerCase() === String(user.username || "").toLowerCase() && item.author !== "admin";
+                        const canEdit = mine || canManageSupport;
+                        const isEditing = editingMessageId === item.id;
+                        return <article className={"support-ticket-message" + (item.author === "admin" ? " from-team" : "")} key={item.id}>
+                          <div className="support-ticket-message-head">
+                            <span>{item.author === "admin" ? "GameOnix support" : mine ? "You" : "@" + (item.username || activeTicket.username)} · {item.createdAt ? new Date(item.createdAt).toLocaleString() : "Just now"}</span>
+                            {canEdit && !isEditing && <div className="support-ticket-message-actions">
+                              <button type="button" onClick={() => { setEditingMessageId(item.id); setEditingMessageDraft(String(item.message || "")); }} disabled={messageActionId === item.id}>Edit</button>
+                              <button type="button" onClick={() => void moderateTicketMessage("delete", activeTicket.id, item.id)} disabled={messageActionId === item.id}>Delete</button>
+                            </div>}
+                          </div>
+                          {isEditing ? <div className="support-ticket-message-editor">
+                            <textarea rows={3} maxLength={MAX_REPLY_LENGTH} value={editingMessageDraft} onChange={(event) => setEditingMessageDraft(event.target.value)} aria-label="Edit ticket message" />
+                            <div><button type="button" onClick={() => { setEditingMessageId(""); setEditingMessageDraft(""); }}>Cancel</button><button type="button" onClick={() => void moderateTicketMessage("edit", activeTicket.id, item.id, editingMessageDraft.trim())} disabled={!editingMessageDraft.trim() || messageActionId === item.id}>{messageActionId === item.id ? "Saving..." : "Save changes"}</button></div>
+                          </div> : <p>{item.message}</p>}
+                        </article>;
+                      })}
                     </div>
                     <form className="support-ticket-reply" onSubmit={sendReply}>
                       <label htmlFor="ticket-reply">Reply to this ticket</label><textarea id="ticket-reply" rows={3} maxLength={MAX_REPLY_LENGTH} value={replyDraft} onChange={(event) => setReplyDraft(event.target.value)} placeholder="Write your message..." />

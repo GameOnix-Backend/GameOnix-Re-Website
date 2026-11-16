@@ -111,16 +111,21 @@ function Notifications() {
   const [copiedCode, setCopiedCode] = useState("");
   const codesLoadedRef = useRef(false);
   const copyTimer = useRef(null);
-  const unreadCount = useMemo(
-    () => notifications.filter((notification) => !notification.readAt).length,
+  const inboxNotifications = useMemo(
+    () => notifications.filter((notification) =>
+      !["support_reply", "bug_report_reply", "support_message"].includes(notification.type)
+    ),
     [notifications]
   );
+  const unreadCount = useMemo(
+    () => inboxNotifications.filter((notification) => !notification.readAt).length,
+    [inboxNotifications]
+  );
   const visibleNotifications = useMemo(
-    () =>
-      filter === "unread"
-        ? notifications.filter((notification) => !notification.readAt)
-        : notifications,
-    [filter, notifications]
+    () => filter === "unread"
+      ? inboxNotifications.filter((notification) => !notification.readAt)
+      : inboxNotifications,
+    [filter, inboxNotifications]
   );
 
   const loadNotifications = useCallback(async ({ refresh = false } = {}) => {
@@ -537,12 +542,6 @@ function Notifications() {
                   </button>
                   {expanded && (
                     <div className="notifications-card-details">
-                      {notification.type === "bug_report_reply" && (
-                        <span className="notifications-reply-badge">
-                          <FontAwesomeIcon icon={faCircleCheck} />
-                          GameOnix team reply
-                        </span>
-                      )}
                       {rows.map((row) => (
                         <div
                           className={`notifications-detail-row${row.long ? " long" : ""}`}
