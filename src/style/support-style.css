@@ -711,6 +711,7 @@
   cursor: pointer;
 }
 .support-ticket-reply > div button:disabled { cursor: not-allowed; opacity: .5; }
+.support-ticket-locked { margin: 0; border: 1px solid var(--primary-border); border-radius: 9px; padding: 12px 14px; color: var(--text-secondary); font-size: 12px; background: var(--primary-subtle); }
 .support-ticket-empty {
   min-height: 430px;
   display: flex;

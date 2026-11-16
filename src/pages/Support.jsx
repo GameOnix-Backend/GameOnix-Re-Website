@@ -170,7 +170,7 @@ export default function Support() {
     setTicketError("");
     try {
       const token = await getCommunityApiToken();
-      const response = await fetch(TICKETS_API_URL, {
+      const response = await fetch(TICKETS_API_URL + "?support=tickets", {
         headers: { Accept: "application/json", Authorization: "Bearer " + token },
         credentials: "omit",
       });
@@ -218,6 +218,8 @@ export default function Support() {
     () => tickets.find((ticket) => ticket.id === activeTicketId) || null,
     [activeTicketId, tickets]
   );
+  const activeTicketStatus = activeTicket ? getTicketStatus(activeTicket) : "";
+  const activeTicketLocked = ["resolved", "closed"].includes(activeTicketStatus);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -285,6 +287,10 @@ export default function Support() {
   async function sendReply(event) {
     event.preventDefault();
     if (!activeTicket || !replyDraft.trim() || sendingReply) return;
+    if (activeTicketLocked) {
+      setTicketError("This ticket is resolved. You can read the conversation, but replies are closed.");
+      return;
+    }
     setSendingReply(true);
     setTicketError("");
     try {
@@ -375,7 +381,7 @@ export default function Support() {
                         const mine = item.author !== "admin" && Boolean(user.username) && messageUsername.toLowerCase() === String(user.username).toLowerCase();
                         const mineAsSupport = item.author === "admin" && Boolean(user.username) && messageUsername.toLowerCase() === String(user.username).toLowerCase();
                         const senderLabel = item.author === "admin" ? "GameOnix support" : mine ? "You" : "@" + (messageUsername || "Player");
-                        const canEdit = mine || canManageSupport;
+                        const canEdit = !activeTicketLocked && (mine || canManageSupport);
                         const canDelete = mine || (canManageSupport && mineAsSupport);
                         const isEditing = editingMessageId === item.id;
                         return <article className={"support-ticket-message" + (item.author === "admin" ? " from-team" : "")} key={item.id}>
@@ -393,10 +399,10 @@ export default function Support() {
                         </article>;
                       })}
                     </div>
-                    <form className="support-ticket-reply" onSubmit={sendReply}>
+                    {activeTicketLocked ? <p className="support-ticket-locked" role="status">This ticket is {activeTicketStatus}. Replies are closed.</p> : <form className="support-ticket-reply" onSubmit={sendReply}>
                       <label htmlFor="ticket-reply">Reply to this ticket</label><textarea id="ticket-reply" rows={3} maxLength={MAX_REPLY_LENGTH} value={replyDraft} onChange={(event) => setReplyDraft(event.target.value)} placeholder="Write your message..." />
                       <div><span>{replyDraft.length} / {MAX_REPLY_LENGTH}</span><button type="submit" disabled={sendingReply || !replyDraft.trim()}><FontAwesomeIcon icon={faPaperPlane} /> {sendingReply ? "Sending..." : "Send reply"}</button></div>
-                    </form>
+                    </form>}
                   </div>
                 ) : (
                   <div className="support-ticket-empty"><FontAwesomeIcon icon={faTicket} /><h2>Your support inbox</h2><p>Choose a ticket to read the conversation, or start a new one.</p><button type="button" className="support-new-ticket" onClick={() => setShowNewTicket(true)}><FontAwesomeIcon icon={faPlus} /> New Ticket</button></div>

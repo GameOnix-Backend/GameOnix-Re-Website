@@ -8,9 +8,11 @@ const REVIEWS_API_URL =
   "https://gameonix-backend.vercel.app/api/auth/comments";
 
 export async function getCommunityApiToken() {
-  const response = await fetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {
+  // The frontend and API use separate domains, so browsers may block the
+  // API's session cookie as a third-party cookie. Send the persisted bearer
+  // token as well; /auth/me accepts either authentication method.
+  const response = await authFetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {
     headers: { Accept: "application/json" },
-    credentials: "include",
   });
   const data = await response.json().catch(() => ({}));
 
