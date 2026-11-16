@@ -138,8 +138,10 @@ function getTicketMessages(ticket) {
 function getTicketStatus(ticket) {
   const stored = String(ticket.details?.status || "").toLowerCase();
   if (stored === "closed") return "closed";
-  if (stored === "answered" || ticket.details?.reply) return "answered";
-  return "open";
+  if (stored === "resolved") return "resolved";
+  if (stored === "pending" || stored === "open") return "pending";
+  if (stored === "answered" || ticket.details?.reply) return "resolved";
+  return "pending";
 }
 
 export default function Support() {

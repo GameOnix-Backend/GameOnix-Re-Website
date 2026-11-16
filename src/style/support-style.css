@@ -647,7 +647,9 @@
   letter-spacing: .04em;
 }
 .support-ticket-status.is-open { border-color: rgb(217 164 65 / 35%); color: #ecc878; background: rgb(217 164 65 / 8%); }
+.support-ticket-status.is-pending { border-color: rgb(217 164 65 / 35%); color: #ecc878; background: rgb(217 164 65 / 8%); }
 .support-ticket-status.is-answered { border-color: rgb(72 191 137 / 32%); color: #87deb7; background: rgb(72 191 137 / 8%); }
+.support-ticket-status.is-resolved { border-color: rgb(72 191 137 / 32%); color: #87deb7; background: rgb(72 191 137 / 8%); }
 .support-ticket-status.is-closed { color: var(--text-muted); background: var(--bg-primary); }
 .support-ticket-list-state {
   display: grid;
