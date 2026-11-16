@@ -7,6 +7,8 @@ import {
   faGamepad,
   faRotate,
   faSearch,
+  faFilter,
+  faArrowDownWideShort,
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
 import {
@@ -203,7 +205,7 @@ function Games() {
           />
         </label>
         <label className="games-filter-control">
-          <span>Availability</span>
+          <span><FontAwesomeIcon icon={faFilter} aria-hidden="true" /> Availability</span>
           <select value={availabilityFilter} onChange={(event) => setAvailabilityFilter(event.target.value)} aria-label="Filter by availability">
             <option value="all">All games</option>
             <option value="available">Available</option>
@@ -211,7 +213,7 @@ function Games() {
           </select>
         </label>
         <label className="games-filter-control">
-          <span>Sort</span>
+          <span><FontAwesomeIcon icon={faArrowDownWideShort} aria-hidden="true" /> Sort</span>
           <select value={order} onChange={(event) => setOrder(event.target.value)} aria-label="Sort games">
             <option value="recent">Recently added</option>
             <option value="title">Name A–Z</option>

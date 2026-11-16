@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faArrowLeft,
     faDownload,
+    faCircleCheck,
+    faCircleXmark,
+    faCompass,
     faHeart,
     faBug,
     faGamepad,
@@ -655,21 +658,17 @@ function GameDetails() {
                                 <strong>{game.publisher || "N/A"}</strong>
                             </div>
                             <div>
-                                <span>Download type</span>
+                                <span><FontAwesomeIcon icon={faDownload} aria-hidden="true" /> Download type</span>
                                 <strong>{game.fileType ? String(game.fileType).replace(/^\w/, (letter) => letter.toUpperCase()) : "Torrent"}</strong>
                             </div>
 
                             <div>
-                                <span>Availability</span>
+                                <span><FontAwesomeIcon icon={game.availability === false ? faCircleXmark : faCircleCheck} aria-hidden="true" /> Availability</span>
                                 <strong className={game.availability === false ? "game-availability-unavailable" : "game-availability-available"}>
                                     {game.availability === false ? "Currently unavailable" : "Available to download"}
                                 </strong>
                             </div>
 
-                            <div>
-                                <span>Date added</span>
-                                <strong>{game.createdAt && Number.isFinite(Date.parse(game.createdAt)) ? new Date(game.createdAt).toLocaleDateString() : "N/A"}</strong>
-                            </div>
                         </div>
 
                         <div className="game-actions-row">
@@ -773,7 +772,7 @@ function GameDetails() {
                 <section className="game-related-section" aria-labelledby="game-related-title">
                     <div className="game-related-heading">
                         <div>
-                            <span>KEEP EXPLORING</span>
+                            <span><FontAwesomeIcon icon={faCompass} aria-hidden="true" /> KEEP EXPLORING</span>
                             <h2 id="game-related-title">More like this</h2>
                         </div>
                         <p>Games with similar genres and platforms</p>

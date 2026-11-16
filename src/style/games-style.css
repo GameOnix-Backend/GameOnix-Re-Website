@@ -256,3 +256,6 @@
     .games-search { grid-column: 1 / -1; }
     .games-filter-control { padding-inline: 9px; }
 }
+
+.games-filter-control span { display: inline-flex; align-items: center; gap: 6px; }
+.games-filter-control span svg { font-size: 0.68rem; }
