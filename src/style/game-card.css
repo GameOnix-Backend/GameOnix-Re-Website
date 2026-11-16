@@ -84,6 +84,9 @@
 }
 
 .game-card-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   min-width: 0;
   padding: 12px 12px 15px;
 }
@@ -160,7 +163,7 @@
   max-width: 100%;
   align-items: center;
   gap: 6px;
-  margin-top: 9px;
+  margin-top: auto;
   padding: 5px 7px;
   overflow: hidden;
   border: 1px solid rgba(139, 92, 246, 0.2);

@@ -346,7 +346,8 @@
 /* Home game cards */
 .home-game-card {
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
     flex: 0 0 180px;
     width: 180px;
     min-width: 0;
