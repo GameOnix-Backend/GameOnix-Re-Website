@@ -83,6 +83,22 @@
   box-shadow: 0 3px 12px rgba(68, 138, 255, 0.3);
 }
 
+.game-card.is-unavailable {
+  opacity: 0.58;
+  filter: grayscale(0.35);
+  cursor: pointer;
+}
+
+.game-card.is-unavailable:hover {
+  transform: none;
+  border-color: var(--border, rgba(255, 255, 255, 0.09));
+  box-shadow: none;
+}
+
+.game-card.is-unavailable .game-card-poster > img {
+  filter: grayscale(0.45);
+}
+
 .game-card-info {
   display: flex;
   flex: 1;

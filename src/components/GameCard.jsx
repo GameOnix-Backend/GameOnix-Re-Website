@@ -62,7 +62,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
   return (
     <Link
       to={`/game/${encodeURIComponent(game.slug)}`}
-      className={`game-card ${className}`.trim()}
+      className={`game-card ${game?.availability === false ? "is-unavailable" : ""} ${className}`.trim()}
       title={title}
     >
       <div className="game-card-poster">

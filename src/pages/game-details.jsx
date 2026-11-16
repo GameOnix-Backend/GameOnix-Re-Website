@@ -642,7 +642,7 @@ function GameDetails() {
                         </div>
 
                         <div className="game-actions-row">
-                            {game.gameLink ? (
+                            {game.availability !== false && game.gameLink ? (
                                 <a
                                     className="game-action game-download"
                                     href={game.gameLink}
@@ -659,7 +659,9 @@ function GameDetails() {
                                     disabled
                                 >
                                     <FontAwesomeIcon icon={faDownload} />
-                                    Download unavailable
+                                    {game.availability === false
+                                        ? "Currently unavailable"
+                                        : "Download unavailable"}
                                 </button>
                             )}
 
