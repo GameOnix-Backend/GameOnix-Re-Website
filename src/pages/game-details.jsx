@@ -9,6 +9,7 @@ import {
     faCircleXmark,
     faCompass,
     faHeart,
+    faBell,
     faBug,
     faGamepad,
     faChevronLeft,
@@ -30,6 +31,7 @@ import {
     removeFavorite,
 } from "../api/favorites";
 import { getCommunityApiToken } from "../api/session";
+import { addFollow, getFollows, getGameAnalytics, recordGameActivity, removeFollow } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
 import AddonsPanel from "../components/AddonsPanel";
 import GameCard from "../components/GameCard";
@@ -81,6 +83,12 @@ function GameDetails() {
     const [favoriteBusy, setFavoriteBusy] = useState(false);
     const [favoriteError, setFavoriteError] = useState("");
     const [showFavoriteMessage, setShowFavoriteMessage] = useState(false);
+    const [follows, setFollows] = useState([]);
+    const [followBusy, setFollowBusy] = useState(false);
+    const [followError, setFollowError] = useState("");
+    const [showFollowLoginMessage, setShowFollowLoginMessage] = useState(false);
+    const [gameStats, setGameStats] = useState(null);
+    const viewedSlug = useRef("");
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [failedImages, setFailedImages] = useState([]);
@@ -137,6 +145,10 @@ function GameDetails() {
                 }
 
                 setGame(found);
+                if (viewedSlug.current !== found.slug) {
+                    viewedSlug.current = found.slug;
+                    void recordGameActivity(found.slug, "view").catch(() => {});
+                }
             } catch (err) {
                 if (err.name !== "AbortError") {
                     setError(err.message || "Something went wrong.");
@@ -151,6 +163,13 @@ function GameDetails() {
         loadGame();
 
         return () => controller.abort();
+    }, [slug]);
+
+    useEffect(() => {
+        let active = true;
+        getFollows().then((data) => { if (active) setFollows(Array.isArray(data.follows) ? data.follows : []); }).catch(() => { if (active) setFollows([]); });
+        getGameAnalytics().then((data) => { if (active) setGameStats(data.games?.find((item) => item.slug === slug) || null); }).catch(() => {});
+        return () => { active = false; };
     }, [slug]);
 
     // Load favorites from the backend.
@@ -301,6 +320,25 @@ function GameDetails() {
         } finally {
             setFavoriteBusy(false);
         }
+    }
+
+    async function toggleFollow() {
+        if (!game || followBusy) return;
+        setFollowBusy(true);
+        setFollowError("");
+        setShowFollowLoginMessage(false);
+        const isFollowing = follows.some((item) => item.slug === game.slug);
+        try {
+            const data = isFollowing
+                ? await removeFollow(game.slug)
+                : await addFollow(game.slug, Array.isArray(game.addons) ? game.addons.length : 0);
+            setFollows(Array.isArray(data.follows) ? data.follows : []);
+            if (gameStats) setGameStats({ ...gameStats, follows: Math.max(0, gameStats.follows + (isFollowing ? -1 : 1)) });
+        } catch (err) {
+            const message = String(err?.message || "").toLowerCase();
+            if (message.includes("log in") || message.includes("unauthorized") || message.includes("401")) setShowFollowLoginMessage(true);
+            else setFollowError(err.message || "Couldn't update your followed games.");
+        } finally { setFollowBusy(false); }
     }
 
     function reportBug() {
@@ -678,6 +716,7 @@ function GameDetails() {
                                     href={game.gameLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={() => { void recordGameActivity(game.slug, "download").catch(() => {}); }}
                                 >
                                     <FontAwesomeIcon icon={faDownload} />
                                     Download Game
@@ -741,6 +780,12 @@ function GameDetails() {
                                     </div>
                                 )}
                             </div>
+                            <div className="favorite-button-wrapper">
+                                <button type="button" className={`game-follow-button${follows.some((item) => item.slug === game.slug) ? " is-following" : ""}`} onClick={toggleFollow} disabled={followBusy} aria-pressed={follows.some((item) => item.slug === game.slug)}>
+                                    <FontAwesomeIcon icon={faBell} /> {follows.some((item) => item.slug === game.slug) ? "Following" : "Follow updates"}
+                                </button>
+                                {showFollowLoginMessage && <div className="favorite-login-message" role="alert"><span>Please log in to follow this game.</span><button type="button" onClick={() => setShowFollowLoginMessage(false)} aria-label="Dismiss message">×</button></div>}
+                            </div>
                         </div>
 
                         {favoriteError && (
@@ -748,6 +793,8 @@ function GameDetails() {
                                 {favoriteError}
                             </p>
                         )}
+                        {followError && <p className="favorite-error" role="alert">{followError}</p>}
+                        {gameStats && <div className="game-usage-stats" aria-label="Game activity"><span>{gameStats.views.toLocaleString()} views</span><span>{gameStats.downloads.toLocaleString()} downloads</span><span>{gameStats.favorites.toLocaleString()} favorites</span><span>{gameStats.follows.toLocaleString()} follows</span></div>}
 
                         <button
                             type="button"

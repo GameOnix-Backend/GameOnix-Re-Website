@@ -7,6 +7,34 @@
     color: var(--text-primary);
 }
 
+.library-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); align-items: start; gap: 24px; margin-top: 30px; }
+.library-layout .library-section { margin-top: 0; }
+.library-sidebar { position: sticky; top: 22px; display: grid; gap: 7px; border: 1px solid var(--border); border-radius: 13px; padding: 10px; background: var(--bg-secondary, #19191e); }
+.library-sidebar button { min-height: 43px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid transparent; border-radius: 8px; padding: 0 11px; color: var(--text-secondary); background: transparent; text-align: left; cursor: pointer; }
+.library-sidebar button:hover, .library-sidebar button.is-active { border-color: rgba(139, 92, 246, .25); color: var(--text-primary); background: rgba(139, 92, 246, .1); }
+.library-sidebar button b { min-width: 23px; border-radius: 99px; padding: 3px 6px; color: #cbbdff; background: rgba(139, 92, 246, .16); font-size: 10px; text-align: center; }
+.library-sidebar-games { display: grid; gap: 4px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 10px; }
+.library-sidebar-caption { margin: 0 5px 3px; color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: 1px; }
+.library-sidebar .library-sidebar-games > button { min-width: 0; justify-content: flex-start; }
+.library-sidebar-games > button img { width: 27px; height: 32px; flex: 0 0 auto; border-radius: 4px; object-fit: cover; background: #20202a; }
+.library-sidebar-games > button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-sidebar-games > button.is-selected { border-color: rgba(139, 92, 246, .3); color: var(--text-primary); background: rgba(139, 92, 246, .1); }
+.library-sidebar-games > small { padding: 7px 5px; color: var(--text-muted); font-size: 10px; }
+.library-game-item { position: relative; min-width: 0; }
+.library-unfollow, .library-update-badge { position: absolute; z-index: 3; top: 8px; right: 8px; border: 1px solid rgba(220, 220, 230, .18); border-radius: 7px; padding: 6px 8px; color: #fff; background: rgba(16, 16, 22, .86); font: inherit; font-size: 10px; }
+.library-unfollow { cursor: pointer; }
+.library-unfollow:hover { border-color: #aa87ff; }
+.library-update-badge { right: auto; left: 8px; color: #c9baff; }
+
+@media (max-width: 760px) {
+  .library-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .library-sidebar { position: static; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .library-sidebar-games { grid-column: 1 / -1; }
+  .library-sidebar-games > button { grid-column: 1 / -1; }
+  .library-sidebar button { min-height: 39px; padding: 0 8px; font-size: 10px; }
+  .library-section { margin-top: 0; }
+}
+
 /* Welcome banner */
 .library-welcome {
     position: relative;

@@ -11,6 +11,7 @@ import {
   faArrowDownWideShort,
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
+import { getGameAnalytics } from "../api/follows";
 import {
   getGameBadgeType,
   getGameReleaseTimestamp,
@@ -44,7 +45,7 @@ function Games() {
   const platform = normalizePlatform(searchParams.get("platform"));
   const type = searchParams.get("type") || "";
   const sort = searchParams.get("sort") || "";
-  const now = Date.now();
+  const [now, setNow] = useState(() => Date.now());
 
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +53,18 @@ function Games() {
   const [search, setSearch] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [order, setOrder] = useState("recent");
+  const [gameAnalytics, setGameAnalytics] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    getGameAnalytics().then((data) => { if (active && Array.isArray(data.games)) setGameAnalytics(data.games); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -122,6 +135,11 @@ function Games() {
     });
 
     matchingGames.sort((first, second) => {
+      if (["downloads", "views", "favorites", "follows"].includes(order)) {
+        const firstCount = gameAnalytics.find((item) => item.slug === first.slug)?.[order] || 0;
+        const secondCount = gameAnalytics.find((item) => item.slug === second.slug)?.[order] || 0;
+        return secondCount - firstCount || String(first.title || "").localeCompare(String(second.title || ""));
+      }
       if (order === "title") return String(first.title || "").localeCompare(String(second.title || ""));
       const firstDate = getGameReleaseTimestamp(first);
       const secondDate = getGameReleaseTimestamp(second);
@@ -130,7 +148,9 @@ function Games() {
         : Number(second.id || 0) - Number(first.id || 0);
     });
     return matchingGames;
-  }, [availabilityFilter, games, order, platform, search, sort, type]);
+  }, [availabilityFilter, gameAnalytics, games, order, platform, search, sort, type]);
+
+  const analyticsBySlug = new Map(gameAnalytics.map((item) => [item.slug, item]));
 
   const platformTitle =
     platform === "pc"
@@ -217,6 +237,10 @@ function Games() {
           <select value={order} onChange={(event) => setOrder(event.target.value)} aria-label="Sort games">
             <option value="recent">Recently added</option>
             <option value="title">Name A–Z</option>
+            <option value="downloads">Most downloaded</option>
+            <option value="views">Most viewed</option>
+            <option value="favorites">Most favorited</option>
+            <option value="follows">Most followed</option>
           </select>
         </label>
       </div>
@@ -231,11 +255,13 @@ function Games() {
       ) : (
         <div className="games-grid">
           {filteredGames.map((game) => (
+            <div className="game-card-analytics-wrap" key={game.slug}>
             <GameCard
-              key={game.slug}
               game={game}
               badgeType={getGameBadgeType(game, now)}
             />
+            <div className="game-card-analytics"><span>{analyticsBySlug.get(game.slug)?.downloads || 0} downloads</span><span>{analyticsBySlug.get(game.slug)?.views || 0} views</span><span>{analyticsBySlug.get(game.slug)?.favorites || 0} favorites</span><span>{analyticsBySlug.get(game.slug)?.follows || 0} follows</span></div>
+            </div>
           ))}
         </div>
       )}

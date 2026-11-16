@@ -47,6 +47,10 @@
     gap: 24px 16px;
 }
 
+.game-card-analytics-wrap { min-width: 0; }
+.game-card-analytics { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.game-card-analytics span { border: 1px solid rgba(147, 126, 219, .2); border-radius: 6px; padding: 4px 6px; color: #b9b1cf; font-size: 9px; background: rgba(147, 126, 219, .07); }
+
 .games-card {
     min-width: 0;
     overflow: hidden;
