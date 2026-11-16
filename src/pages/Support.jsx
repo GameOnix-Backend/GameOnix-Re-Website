@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faCheck, faChevronDown, faCircleQuestion, faGift, faLock, faPaperPlane, faPlus, faReceipt, faRotateRight, faTicket, faUserShield, faWallet } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCheck, faChevronDown, faCircleQuestion, faGift, faLock, faPaperPlane, faPen, faPlus, faReceipt, faRotateRight, faTicket, faTrashCan, faUserShield, faWallet } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { useAuth } from "../context/AuthContext";
 import { getCommunityApiToken } from "../api/session";
@@ -373,15 +373,17 @@ export default function Support() {
                       {getTicketMessages(activeTicket).map((item) => {
                         const messageUsername = String(item.username || activeTicket.username || user.username || "").trim();
                         const mine = item.author !== "admin" && Boolean(user.username) && messageUsername.toLowerCase() === String(user.username).toLowerCase();
+                        const mineAsSupport = item.author === "admin" && Boolean(user.username) && messageUsername.toLowerCase() === String(user.username).toLowerCase();
                         const senderLabel = item.author === "admin" ? "GameOnix support" : mine ? "You" : "@" + (messageUsername || "Player");
                         const canEdit = mine || canManageSupport;
+                        const canDelete = mine || (canManageSupport && mineAsSupport);
                         const isEditing = editingMessageId === item.id;
                         return <article className={"support-ticket-message" + (item.author === "admin" ? " from-team" : "")} key={item.id}>
                           <div className="support-ticket-message-head">
                             <span>{senderLabel} · {item.createdAt ? new Date(item.createdAt).toLocaleString() : "Just now"}</span>
-                            {canEdit && !isEditing && <div className="support-ticket-message-actions">
-                              <button type="button" onClick={() => { setEditingMessageId(item.id); setEditingMessageDraft(String(item.message || "")); }} disabled={messageActionId === item.id}>Edit</button>
-                              <button type="button" onClick={() => void moderateTicketMessage("delete", activeTicket.id, item.id)} disabled={messageActionId === item.id}>Delete</button>
+                            {(canEdit || canDelete) && !isEditing && <div className="support-ticket-message-actions">
+                              {canEdit && <button type="button" title="Edit message" aria-label="Edit message" onClick={() => { setEditingMessageId(item.id); setEditingMessageDraft(String(item.message || "")); }} disabled={messageActionId === item.id}><FontAwesomeIcon icon={faPen} /></button>}
+                              {canDelete && <button type="button" title="Delete message" aria-label="Delete message" onClick={() => void moderateTicketMessage("delete", activeTicket.id, item.id)} disabled={messageActionId === item.id}><FontAwesomeIcon icon={faTrashCan} /></button>}
                             </div>}
                           </div>
                           {isEditing ? <div className="support-ticket-message-editor">

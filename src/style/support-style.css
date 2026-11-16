@@ -891,6 +891,7 @@
   gap: 12px;
 }
 .support-ticket-message-actions { display: inline-flex; align-items: center; gap: 5px; }
+.support-ticket-message { position: relative; }
 .support-ticket-message-actions button,
 .support-ticket-message-editor > div button {
   border: 1px solid var(--border);
@@ -903,8 +904,12 @@
   background: var(--bg-secondary);
   cursor: pointer;
 }
+.support-ticket-message-actions button { display: grid; width: 25px; height: 25px; place-items: center; padding: 0; opacity: 0; pointer-events: none; transition: opacity .14s ease, border-color .14s ease, color .14s ease; }
+.support-ticket-message:hover .support-ticket-message-actions button,
+.support-ticket-message:focus-within .support-ticket-message-actions button { opacity: 1; pointer-events: auto; }
 .support-ticket-message-actions button:hover { border-color: var(--primary); color: var(--text-primary); }
 .support-ticket-message-actions button:last-child:hover { border-color: var(--danger-border); color: var(--danger); }
+@media (hover: none) { .support-ticket-message-actions button { opacity: 1; pointer-events: auto; } }
 .support-ticket-message-editor { display: grid; gap: 7px; margin-top: 8px; }
 .support-ticket-message-editor textarea {
   width: 100%;
