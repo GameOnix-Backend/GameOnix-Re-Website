@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGamepad } from "@fortawesome/free-solid-svg-icons";
+import { faDatabase, faGamepad } from "@fortawesome/free-solid-svg-icons";
 
 import "../style/game-card.css";
 import { getGameCategories } from "../utils/game-categories";
@@ -51,6 +51,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
   const [failedPoster, setFailedPoster] = useState("");
   const title = game?.title || "Untitled Game";
   const platformLabel = getPlatformLabel(game?.platform);
+  const gameSize = String(game?.size ?? "").trim();
 
   // عرض جميع الأنواع الموجودة في gameTypes
   const gameCategories = getGameCategories(game);
@@ -81,7 +82,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
 
         {badgeType && (
           <span className={`game-card-new ${badgeType === "UPDATE" ? "game-card-update" : ""}`}>
-            {badgeType}
+            {badgeType === "UPDATE" ? "UPDATED" : badgeType}
           </span>
         )}
       </div>
@@ -125,6 +126,13 @@ function GameCard({ game, badgeType = "", className = "" }) {
         >
           {game?.publisher || "Unknown publisher"}
         </p>
+
+        {gameSize && (
+          <span className="game-card-size" title={`Game size: ${gameSize}`}>
+            <FontAwesomeIcon icon={faDatabase} aria-hidden="true" />
+            <span>{gameSize}</span>
+          </span>
+        )}
       </div>
     </Link>
   );

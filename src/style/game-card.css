@@ -154,6 +154,35 @@
   white-space: nowrap;
 }
 
+.game-card-size {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  padding: 5px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #c4b5fd;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.game-card-size svg {
+  flex: 0 0 auto;
+  font-size: 9px;
+}
+
+.game-card-size span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .game-card,
   .game-card-poster > img {
