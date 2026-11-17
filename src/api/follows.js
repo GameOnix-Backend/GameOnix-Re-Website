@@ -18,16 +18,14 @@ export function addFollow(slug, addonCount = 0) { return request("POST", { colle
 export function removeFollow(slug) { return request("POST", { collection: "follows", operation: "remove", slug }); }
 export function getGameAnalytics() { return request("GET", null, "?analytics=1"); }
 export function recordGameActivity(slug, event) {
-  const body = JSON.stringify({ event, slug });
+  const activityUrl = `${API_URL}?event=${encodeURIComponent(event)}&slug=${encodeURIComponent(slug)}`;
   if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
-    const queued = navigator.sendBeacon(API_URL, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+    const queued = navigator.sendBeacon(activityUrl);
     if (queued) return Promise.resolve({ recorded: true });
   }
 
-  return fetch(API_URL, {
+  return fetch(activityUrl, {
     method: "POST",
-    headers: { "Content-Type": "text/plain;charset=UTF-8" },
-    body,
     keepalive: true,
   }).then(async (response) => {
     const data = await response.json().catch(() => ({}));
