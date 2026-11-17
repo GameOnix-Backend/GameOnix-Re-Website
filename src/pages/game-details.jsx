@@ -116,6 +116,58 @@ function RequirementsPanel({ game }) {
     );
 }
 
+function chooseRelatedGames(game, allGames) {
+    const categories = new Set(getGameCategories(game).map((value) => value.toLocaleLowerCase()));
+    const platform = String(game.platform || "").toLocaleLowerCase();
+    const publisher = String(game.publisher || "").trim().toLocaleLowerCase();
+    const candidates = allGames
+        .filter((candidate) => candidate.slug !== game.slug && candidate.availability !== false)
+        .map((candidate) => {
+            const sharedCategories = getGameCategories(candidate)
+                .filter((value) => categories.has(value.toLocaleLowerCase())).length;
+            const samePlatform = platform && String(candidate.platform || "").toLocaleLowerCase() === platform;
+            const samePublisher = publisher && String(candidate.publisher || "").trim().toLocaleLowerCase() === publisher;
+            const score = sharedCategories * 3 + Number(samePlatform) + Number(samePublisher) * 0.5;
+            return { candidate, score };
+        })
+        .filter((item) => item.score > 0);
+
+    if (!candidates.length) return [];
+
+    let recent = [];
+    try {
+        recent = JSON.parse(window.sessionStorage.getItem(`gameonix:related:${game.slug}`) || "[]");
+        if (!Array.isArray(recent)) recent = [];
+    } catch {
+        recent = [];
+    }
+
+    const recentSlugs = new Set(recent);
+    const freshCandidates = candidates.filter((item) => !recentSlugs.has(item.candidate.slug));
+    const pool = freshCandidates.length >= Math.min(4, candidates.length) ? freshCandidates : candidates;
+    const selected = [];
+
+    while (pool.length && selected.length < 4) {
+        const weights = pool.map(({ score, candidate }) => score * score * (recentSlugs.has(candidate.slug) ? 0.08 : 1));
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+        let roll = Math.random() * totalWeight;
+        let selectedIndex = weights.findIndex((weight) => (roll -= weight) <= 0);
+        if (selectedIndex < 0) selectedIndex = pool.length - 1;
+        selected.push(pool.splice(selectedIndex, 1)[0].candidate);
+    }
+
+    try {
+        window.sessionStorage.setItem(
+            `gameonix:related:${game.slug}`,
+            JSON.stringify([...recent, ...selected.map((item) => item.slug)].slice(-16))
+        );
+    } catch {
+        // Recommendations remain usable when session storage is unavailable.
+    }
+
+    return selected;
+}
+
 function isLoginError(err) {
     const message = String(err?.message || "").toLowerCase();
 
@@ -137,6 +189,7 @@ function GameDetails() {
 
     const [game, setGame] = useState(null);
     const [allGames, setAllGames] = useState([]);
+    const [relatedGames, setRelatedGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -173,6 +226,10 @@ function GameDetails() {
         reportDescriptionRef.current?.focus();
         return () => window.removeEventListener("keydown", handleReportKeyDown);
     }, [reportOpen, reportSubmitting]);
+
+    useEffect(() => {
+        setRelatedGames(game && allGames.length ? chooseRelatedGames(game, allGames) : []);
+    }, [game, allGames]);
 
     // Load game details.
     useEffect(() => {
@@ -484,19 +541,6 @@ function GameDetails() {
 
     const isFavorite = favorites.includes(game.slug);
     const addons = getAddonList(game.addons);
-    const currentCategories = new Set(getGameCategories(game).map((category) => category.toLocaleLowerCase()));
-    const relatedGames = allGames
-        .filter((candidate) => candidate.slug !== game.slug && candidate.availability !== false)
-        .map((candidate) => {
-            const sharedCategories = getGameCategories(candidate)
-                .filter((category) => currentCategories.has(category.toLocaleLowerCase())).length;
-            const samePlatform = String(candidate.platform || "").toLocaleLowerCase() === String(game.platform || "").toLocaleLowerCase();
-            return { candidate, score: sharedCategories * 2 + Number(samePlatform) };
-        })
-        .filter((item) => item.score > 0)
-        .sort((first, second) => second.score - first.score || Number(second.candidate.id || 0) - Number(first.candidate.id || 0))
-        .slice(0, 4)
-        .map((item) => item.candidate);
 
     return (
         <>
