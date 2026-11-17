@@ -54,6 +54,44 @@ function getGameList(data) {
     return Array.isArray(data?.games) ? data.games : [];
 }
 
+function RequirementsPanel({ game }) {
+    const requirements = game?.requirements && typeof game.requirements === "object"
+        ? game.requirements
+        : {};
+    const minimum = String(requirements.minimum || "").trim();
+    const recommended = String(requirements.recommended || "").trim();
+    const isPc = ["pc", "windows", "computer"].includes(
+        String(game?.platform || "").trim().toLowerCase()
+    );
+
+    return (
+        <section className="game-requirements-panel" aria-labelledby="game-requirements-title">
+            <header className="game-requirements-heading">
+                <span>SYSTEM REQUIREMENTS</span>
+                <h2 id="game-requirements-title">Can your PC run {game.title}?</h2>
+                <p>Check the minimum specs, or compare them with the recommended setup for a better experience.</p>
+            </header>
+            {!isPc ? (
+                <div className="game-requirements-empty">System requirements are not applicable to this platform.</div>
+            ) : !minimum && !recommended ? (
+                <div className="game-requirements-empty">System requirements have not been added for this game yet.</div>
+            ) : (
+                <div className="game-requirements-grid">
+                    {[{ label: "Minimum", text: minimum }, { label: "Recommended", text: recommended }]
+                        .filter((tier) => tier.text)
+                        .map((tier) => (
+                            <article className="game-requirements-card" key={tier.label}>
+                                <h3>{tier.label}</h3>
+                                <pre>{tier.text}</pre>
+                            </article>
+                        ))}
+                </div>
+            )}
+            {requirements.source && <p className="game-requirements-source">Source: {String(requirements.source)}</p>}
+        </section>
+    );
+}
+
 function isLoginError(err) {
     const message = String(err?.message || "").toLowerCase();
 
@@ -487,6 +525,14 @@ function GameDetails() {
 
                 <button
                     type="button"
+                    className={activeTab === "requirements" ? "active" : ""}
+                    onClick={() => setActiveTab("requirements")}
+                >
+                    Requirements
+                </button>
+
+                <button
+                    type="button"
                     className={activeTab === "reviews" ? "active" : ""}
                     onClick={() => setActiveTab("reviews")}
                 >
@@ -807,6 +853,8 @@ function GameDetails() {
                 </section>
             ) : activeTab === "addons" ? (
                 <AddonsPanel addons={addons} />
+            ) : activeTab === "requirements" ? (
+                <RequirementsPanel game={game} />
             ) : (
                 <GameReviews slug={game.slug} title={game.title} />
             )}

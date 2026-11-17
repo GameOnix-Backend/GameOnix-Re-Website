@@ -1056,3 +1056,16 @@
 @media (max-width: 560px) { .game-related-heading { align-items: flex-start; flex-direction: column; } .game-related-grid { gap: 10px; } }
 
 .game-related-heading > div > span { display: inline-flex; align-items: center; gap: 6px; }
+
+.game-requirements-panel { max-width: 1040px; margin: 10px auto 0; border: 1px solid var(--game-border); border-radius: 16px; padding: clamp(18px, 3vw, 30px); background: var(--game-surface, rgba(255, 255, 255, .025)); }
+.game-requirements-heading > span { color: var(--game-accent); font-size: 10px; font-weight: 800; letter-spacing: 1.4px; }
+.game-requirements-heading h2 { margin: 8px 0; color: var(--game-text); font-size: clamp(20px, 3vw, 28px); }
+.game-requirements-heading p { max-width: 620px; margin: 0; color: var(--game-muted); font-size: 13px; line-height: 1.65; }
+.game-requirements-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+.game-requirements-card { min-width: 0; overflow: hidden; border: 1px solid var(--game-border); border-radius: 12px; padding: 18px; background: rgba(0, 0, 0, .12); }
+.game-requirements-card h3 { margin: 0 0 14px; color: var(--game-text); font-size: 16px; }
+.game-requirements-card pre { margin: 0; color: var(--game-muted); font-family: inherit; font-size: 12px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.game-requirements-empty { margin-top: 20px; border: 1px dashed var(--game-border); border-radius: 10px; padding: 20px; color: var(--game-muted); font-size: 13px; }
+.game-requirements-source { margin: 14px 0 0; color: var(--game-muted); font-size: 10px; }
+@media (max-width: 700px) { .game-requirements-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .game-tabs { gap: 18px; overflow-x: auto; } .game-tabs button { flex: 0 0 auto; font-size: 13px; } }
