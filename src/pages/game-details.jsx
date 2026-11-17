@@ -31,7 +31,7 @@ import {
     removeFavorite,
 } from "../api/favorites";
 import { getCommunityApiToken } from "../api/session";
-import { addFollow, getFollows, getGameAnalytics, recordGameActivity, removeFollow } from "../api/follows";
+import { addFollow, getFollows, recordGameActivity, removeFollow } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
 import AddonsPanel from "../components/AddonsPanel";
 import GameCard from "../components/GameCard";
@@ -87,7 +87,6 @@ function GameDetails() {
     const [followBusy, setFollowBusy] = useState(false);
     const [followError, setFollowError] = useState("");
     const [showFollowLoginMessage, setShowFollowLoginMessage] = useState(false);
-    const [gameStats, setGameStats] = useState(null);
     const viewedSlug = useRef("");
 
     const [selectedImage, setSelectedImage] = useState(0);
@@ -168,7 +167,6 @@ function GameDetails() {
     useEffect(() => {
         let active = true;
         getFollows().then((data) => { if (active) setFollows(Array.isArray(data.follows) ? data.follows : []); }).catch(() => { if (active) setFollows([]); });
-        getGameAnalytics().then((data) => { if (active) setGameStats(data.games?.find((item) => item.slug === slug) || null); }).catch(() => {});
         return () => { active = false; };
     }, [slug]);
 
@@ -333,7 +331,6 @@ function GameDetails() {
                 ? await removeFollow(game.slug)
                 : await addFollow(game.slug, Array.isArray(game.addons) ? game.addons.length : 0);
             setFollows(Array.isArray(data.follows) ? data.follows : []);
-            if (gameStats) setGameStats({ ...gameStats, follows: Math.max(0, gameStats.follows + (isFollowing ? -1 : 1)) });
         } catch (err) {
             const message = String(err?.message || "").toLowerCase();
             if (message.includes("log in") || message.includes("unauthorized") || message.includes("401")) setShowFollowLoginMessage(true);
@@ -794,8 +791,6 @@ function GameDetails() {
                             </p>
                         )}
                         {followError && <p className="favorite-error" role="alert">{followError}</p>}
-                        {gameStats && <div className="game-usage-stats" aria-label="Game activity"><span>{gameStats.views.toLocaleString()} views</span><span>{gameStats.downloads.toLocaleString()} downloads</span><span>{gameStats.favorites.toLocaleString()} favorites</span><span>{gameStats.follows.toLocaleString()} follows</span></div>}
-
                         <button
                             type="button"
                             className="game-action game-report"

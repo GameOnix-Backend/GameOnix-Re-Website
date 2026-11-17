@@ -15,6 +15,6 @@ async function request(method, body, query = "") {
 
 export function getFollows() { return request("GET", null, "?collection=follows"); }
 export function addFollow(slug, addonCount = 0) { return request("POST", { collection: "follows", slug, addonCount }); }
-export function removeFollow(slug) { return request("DELETE", { collection: "follows", slug }); }
+export function removeFollow(slug) { return request("POST", { collection: "follows", operation: "remove", slug }); }
 export function getGameAnalytics() { return request("GET", null, "?analytics=1"); }
 export function recordGameActivity(slug, event) { return request("POST", { event, slug }); }
