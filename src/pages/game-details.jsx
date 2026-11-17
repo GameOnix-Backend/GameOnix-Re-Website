@@ -112,7 +112,6 @@ function RequirementsPanel({ game }) {
                     ))}
                 </div>
             )}
-            {requirements.source && <a className="game-requirements-source" href={requirements.steamAppId ? "https://store.steampowered.com/app/" + encodeURIComponent(requirements.steamAppId) + "/" : "https://store.steampowered.com/"} target="_blank" rel="noreferrer">Verified source: {String(requirements.source)} <span aria-hidden="true">↗</span></a>}
         </section>
     );
 }

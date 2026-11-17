@@ -1066,7 +1066,6 @@
 .game-requirements-card h3 { margin: 0 0 14px; color: var(--game-text); font-size: 16px; }
 .game-requirements-card pre { margin: 0; color: var(--game-muted); font-family: inherit; font-size: 12px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .game-requirements-empty { margin-top: 20px; border: 1px dashed var(--game-border); border-radius: 10px; padding: 20px; color: var(--game-muted); font-size: 13px; }
-.game-requirements-source { margin: 14px 0 0; color: var(--game-muted); font-size: 10px; }
 @media (max-width: 700px) { .game-requirements-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .game-tabs { gap: 18px; overflow-x: auto; } .game-tabs button { flex: 0 0 auto; font-size: 13px; } }
 
@@ -1091,7 +1090,13 @@
 .game-requirements-item-value { min-width: 0; color: #e1e0e8; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
 .game-requirements-empty { display: grid; gap: 6px; margin-top: 20px; border: 1px dashed rgba(255, 255, 255, .14); border-radius: 14px; padding: 22px; color: var(--game-muted); font-size: 12px; line-height: 1.6; }
 .game-requirements-empty strong { color: var(--game-text); font-size: 14px; }
-.game-requirements-source { display: inline-flex; align-items: center; gap: 6px; margin-top: 17px; color: #b8a8ff; font-size: 11px; text-decoration: none; }
-.game-requirements-source:hover { color: #ded6ff; text-decoration: underline; }
 @media (max-width: 700px) { .game-requirements-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .game-requirements-panel { border-radius: 16px; padding: 18px; } .game-requirements-heading { align-items: flex-start; flex-direction: column; } .game-requirements-item { grid-template-columns: minmax(72px, .32fr) minmax(0, 1fr); gap: 8px; } }
+
+/* Requirements use the full content width, with one standalone tier per row. */
+.game-requirements-panel { width: 100%; max-width: none; margin: 10px 0 0; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.game-requirements-heading { padding: 4px 0 20px; }
+.game-requirements-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 18px; }
+.game-requirements-card { padding: 0 20px; border: 1px solid rgba(255, 255, 255, .09); border-radius: 12px; background: rgba(16, 19, 24, .72); }
+.game-requirements-card--recommended { border-color: rgba(255, 255, 255, .09); background: rgba(16, 19, 24, .72); }
+@media (max-width: 560px) { .game-requirements-card { padding: 0 14px; } }
