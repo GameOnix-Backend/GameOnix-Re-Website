@@ -17,4 +17,21 @@ export function getFollows() { return request("GET", null, "?collection=follows"
 export function addFollow(slug, addonCount = 0) { return request("POST", { collection: "follows", slug, addonCount }); }
 export function removeFollow(slug) { return request("POST", { collection: "follows", operation: "remove", slug }); }
 export function getGameAnalytics() { return request("GET", null, "?analytics=1"); }
-export function recordGameActivity(slug, event) { return request("POST", { event, slug }); }
+export function recordGameActivity(slug, event) {
+  const body = JSON.stringify({ event, slug });
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const queued = navigator.sendBeacon(API_URL, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+    if (queued) return Promise.resolve({ recorded: true });
+  }
+
+  return fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
+    body,
+    keepalive: true,
+  }).then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Game activity could not be recorded.");
+    return data;
+  });
+}
