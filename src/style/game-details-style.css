@@ -1069,3 +1069,30 @@
 .game-requirements-source { margin: 14px 0 0; color: var(--game-muted); font-size: 10px; }
 @media (max-width: 700px) { .game-requirements-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .game-tabs { gap: 18px; overflow-x: auto; } .game-tabs button { flex: 0 0 auto; font-size: 13px; } }
+
+/* System requirements redesign */
+.game-requirements-panel { max-width: 1100px; margin: 10px auto 0; padding: clamp(20px, 3.4vw, 38px); overflow: hidden; border: 1px solid rgba(160, 143, 255, .18); border-radius: 22px; background: radial-gradient(ellipse at 4% 0%, rgba(130, 92, 255, .13), transparent 42%), linear-gradient(145deg, rgba(20, 20, 29, .98), rgba(12, 13, 18, .98)); box-shadow: 0 24px 70px rgba(0, 0, 0, .24); }
+.game-requirements-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; padding-bottom: 25px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.game-requirements-eyebrow { color: var(--game-accent); font-size: 10px; font-weight: 850; letter-spacing: 1.8px; }
+.game-requirements-heading h2 { margin: 9px 0 7px; color: var(--game-text); font-size: clamp(23px, 3vw, 32px); letter-spacing: -.7px; }
+.game-requirements-heading p { max-width: 620px; margin: 0; color: var(--game-muted); font-size: 13px; line-height: 1.7; }
+.game-requirements-platform { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 999px; color: #e4e0ff; background: rgba(255, 255, 255, .04); font-size: 11px; font-weight: 700; }
+.game-requirements-platform span { color: #8f75ff; font-size: 10px; }
+.game-requirements-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 22px; align-items: stretch; }
+.game-requirements-card { min-width: 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, .09); border-radius: 16px; padding: 0 18px; background: linear-gradient(150deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .018)); }
+.game-requirements-card--recommended { border-color: rgba(153, 125, 255, .3); background: linear-gradient(150deg, rgba(124, 91, 255, .09), rgba(255, 255, 255, .018) 65%); }
+.game-requirements-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 0 15px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.game-requirements-tier-label { color: var(--game-muted); font-size: 10px; }
+.game-requirements-card h3 { margin: 4px 0 0; color: var(--game-text); font-size: 18px; }
+.game-requirements-tier-mark { color: rgba(184, 168, 255, .65); font-size: 12px; font-weight: 800; letter-spacing: 1px; }
+.game-requirements-list { margin: 0; padding: 4px 0; list-style: none; }
+.game-requirements-item { display: grid; grid-template-columns: minmax(82px, .34fr) minmax(0, 1fr); gap: 12px; padding: 13px 0; border-bottom: 1px solid rgba(255, 255, 255, .055); }
+.game-requirements-item:last-child { border-bottom: 0; }
+.game-requirements-item-label { color: #a89aff; font-size: 10px; font-weight: 750; line-height: 1.6; }
+.game-requirements-item-value { min-width: 0; color: #e1e0e8; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.game-requirements-empty { display: grid; gap: 6px; margin-top: 20px; border: 1px dashed rgba(255, 255, 255, .14); border-radius: 14px; padding: 22px; color: var(--game-muted); font-size: 12px; line-height: 1.6; }
+.game-requirements-empty strong { color: var(--game-text); font-size: 14px; }
+.game-requirements-source { display: inline-flex; align-items: center; gap: 6px; margin-top: 17px; color: #b8a8ff; font-size: 11px; text-decoration: none; }
+.game-requirements-source:hover { color: #ded6ff; text-decoration: underline; }
+@media (max-width: 700px) { .game-requirements-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .game-requirements-panel { border-radius: 16px; padding: 18px; } .game-requirements-heading { align-items: flex-start; flex-direction: column; } .game-requirements-item { grid-template-columns: minmax(72px, .32fr) minmax(0, 1fr); gap: 8px; } }

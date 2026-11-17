@@ -63,31 +63,56 @@ function RequirementsPanel({ game }) {
     const isPc = ["pc", "windows", "computer"].includes(
         String(game?.platform || "").trim().toLowerCase()
     );
+    const tiers = [
+        { label: "Minimum", note: "To run the game", text: minimum, tone: "minimum" },
+        { label: "Recommended", note: "For a smoother experience", text: recommended, tone: "recommended" },
+    ].filter((tier) => tier.text);
+    const parseRequirements = (text) => text.split(/\r?\n/)
+        .map((line) => line.trim().replace(/^[-*•]\s*/, "").replace(/\s{2,}/g, " "))
+        .filter(Boolean)
+        .map((line) => {
+            const separator = line.indexOf(":");
+            if (separator > 0 && separator < 36) {
+                return { label: line.slice(0, separator).replace(/\s*\*$/, "").trim(), value: line.slice(separator + 1).trim() };
+            }
+            return { label: "Additional info", value: line };
+        });
 
     return (
         <section className="game-requirements-panel" aria-labelledby="game-requirements-title">
             <header className="game-requirements-heading">
-                <span>SYSTEM REQUIREMENTS</span>
-                <h2 id="game-requirements-title">Can your PC run {game.title}?</h2>
-                <p>Check the minimum specs, or compare them with the recommended setup for a better experience.</p>
+                <div className="game-requirements-heading-copy">
+                    <span className="game-requirements-eyebrow">PC SPECS</span>
+                    <h2 id="game-requirements-title">System requirements</h2>
+                    <p>Check what you need to get {game.title} running, then compare with the recommended setup.</p>
+                </div>
+                {isPc && <span className="game-requirements-platform"><span aria-hidden="true">▰</span> Windows PC</span>}
             </header>
             {!isPc ? (
-                <div className="game-requirements-empty">System requirements are not applicable to this platform.</div>
-            ) : !minimum && !recommended ? (
-                <div className="game-requirements-empty">System requirements have not been added for this game yet.</div>
+                <div className="game-requirements-empty"><strong>PC specifications unavailable</strong><span>System requirements are not applicable to this platform.</span></div>
+            ) : !tiers.length ? (
+                <div className="game-requirements-empty"><strong>Requirements coming soon</strong><span>System requirements have not been added for this game yet.</span></div>
             ) : (
                 <div className="game-requirements-grid">
-                    {[{ label: "Minimum", text: minimum }, { label: "Recommended", text: recommended }]
-                        .filter((tier) => tier.text)
-                        .map((tier) => (
-                            <article className="game-requirements-card" key={tier.label}>
-                                <h3>{tier.label}</h3>
-                                <pre>{tier.text}</pre>
-                            </article>
-                        ))}
+                    {tiers.map((tier) => (
+                        <article className={"game-requirements-card game-requirements-card--" + tier.tone} key={tier.label}>
+                            <div className="game-requirements-card-heading">
+                                <div><span className="game-requirements-tier-label">{tier.note}</span><h3>{tier.label}</h3></div>
+                                <span className="game-requirements-tier-mark" aria-hidden="true">{tier.tone === "minimum" ? "01" : "02"}</span>
+                            </div>
+                            <ul className="game-requirements-list">
+                                {parseRequirements(tier.text).map((item, index) => (
+                                    <li className="game-requirements-item" key={item.label + "-" + index}>
+                                        <span className="game-requirements-item-label">{item.label}</span>
+                                        <span className="game-requirements-item-value">{item.value}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </article>
+                    ))}
                 </div>
             )}
-            {requirements.source && <p className="game-requirements-source">Source: {String(requirements.source)}</p>}
+            {requirements.source && <a className="game-requirements-source" href={requirements.steamAppId ? "https://store.steampowered.com/app/" + encodeURIComponent(requirements.steamAppId) + "/" : "https://store.steampowered.com/"} target="_blank" rel="noreferrer">Verified source: {String(requirements.source)} <span aria-hidden="true">↗</span></a>}
         </section>
     );
 }
@@ -163,8 +188,11 @@ function GameDetails() {
                 setSelectedImage(0);
                 setActiveTab("overview");
 
-                const response = await fetch(DATA_URL, {
+                const dataUrl = new URL(DATA_URL);
+                dataUrl.searchParams.set("_", String(Date.now()));
+                const response = await fetch(dataUrl, {
                     signal: controller.signal,
+                    cache: "no-store",
                 });
 
                 if (!response.ok) {
