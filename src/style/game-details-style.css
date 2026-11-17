@@ -1084,7 +1084,6 @@
 .game-requirements-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 0 15px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .game-requirements-tier-label { color: var(--game-muted); font-size: 10px; }
 .game-requirements-card h3 { margin: 4px 0 0; color: var(--game-text); font-size: 18px; }
-.game-requirements-tier-mark { color: rgba(184, 168, 255, .65); font-size: 12px; font-weight: 800; letter-spacing: 1px; }
 .game-requirements-list { margin: 0; padding: 4px 0; list-style: none; }
 .game-requirements-item { display: grid; grid-template-columns: minmax(82px, .34fr) minmax(0, 1fr); gap: 12px; padding: 13px 0; border-bottom: 1px solid rgba(255, 255, 255, .055); }
 .game-requirements-item:last-child { border-bottom: 0; }

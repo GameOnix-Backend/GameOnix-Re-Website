@@ -98,7 +98,7 @@ function RequirementsPanel({ game }) {
                         <article className={"game-requirements-card game-requirements-card--" + tier.tone} key={tier.label}>
                             <div className="game-requirements-card-heading">
                                 <div><span className="game-requirements-tier-label">{tier.note}</span><h3>{tier.label}</h3></div>
-                                <span className="game-requirements-tier-mark" aria-hidden="true">{tier.tone === "minimum" ? "01" : "02"}</span>
+
                             </div>
                             <ul className="game-requirements-list">
                                 {parseRequirements(tier.text).map((item, index) => (
