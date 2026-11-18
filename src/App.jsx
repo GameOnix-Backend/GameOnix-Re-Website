@@ -55,6 +55,7 @@ function SiteStatusGate({ children }) {
         const response = await fetch(SITE_STATUS_URL, {
           headers: { Accept: "application/json" },
           cache: "no-store",
+          signal: AbortSignal.timeout(5000),
         });
         if (!response.ok) throw new Error("Site status unavailable");
         const status = await response.json();
@@ -65,7 +66,11 @@ function SiteStatusGate({ children }) {
           setSiteControl(status);
         }
       } catch {
-        // Keep protected content hidden until the site status can be confirmed.
+        // A status-store outage must not hide the whole application. The API
+        // also fails open when it cannot read the site-control setting.
+        if (active) {
+          setSiteControl((current) => current || { mode: "online" });
+        }
       }
     };
 
