@@ -55,7 +55,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
 
   // عرض جميع الأنواع الموجودة في gameTypes
   const gameCategories = getGameCategories(game);
-  const visibleCategories = gameCategories.slice(0, 4);
+  const visibleCategories = gameCategories.slice(0, 3);
   const hiddenCategoryCount = gameCategories.length - visibleCategories.length;
 
   const fileTypeLabel = capitalizeFirstLetter(game?.fileType);
@@ -69,12 +69,16 @@ function GameCard({ game, badgeType = "", className = "" }) {
     >
       <div className="game-card-poster">
         {poster && !imageFailed ? (
-          <img
-            src={poster}
-            alt={`${title} poster`}
-            loading="lazy"
-            onError={() => setFailedPoster(poster)}
-          />
+          <>
+            <img className="game-card-poster-backdrop" src={poster} alt="" aria-hidden="true" />
+            <img
+              className="game-card-poster-image"
+              src={poster}
+              alt={`${title} poster`}
+              loading="lazy"
+              onError={() => setFailedPoster(poster)}
+            />
+          </>
         ) : (
           <div className="game-card-placeholder">
             <FontAwesomeIcon icon={faGamepad} />
@@ -111,7 +115,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
           {hiddenCategoryCount > 0 && (
             <span
               className="game-card-category game-card-category-count"
-              title={gameCategories.slice(4).join(", ")}
+              title={gameCategories.slice(3).join(", ")}
               aria-label={`${hiddenCategoryCount} more categories`}
             >
               +{hiddenCategoryCount}
