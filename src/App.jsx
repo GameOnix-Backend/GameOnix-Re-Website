@@ -47,7 +47,6 @@ const SITE_MODE_CONTENT = {
 
 function SiteStatusGate({ children }) {
   const [siteControl, setSiteControl] = useState(null);
-  const [statusUnavailable, setStatusUnavailable] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -64,11 +63,9 @@ function SiteStatusGate({ children }) {
         }
         if (active) {
           setSiteControl(status);
-          setStatusUnavailable(false);
         }
       } catch {
         // Keep protected content hidden until the site status can be confirmed.
-        if (active) setStatusUnavailable(true);
       }
     };
 
@@ -83,16 +80,20 @@ function SiteStatusGate({ children }) {
   }, []);
 
   const content = siteControl ? SITE_MODE_CONTENT[siteControl.mode] : null;
-  if (!siteControl || content) {
+  if (!siteControl) {
+    return <main className="site-control-screen is-checking" aria-hidden="true" />;
+  }
+
+  if (content) {
     return (
       <main className={`site-control-screen is-${siteControl?.mode || "checking"}`}>
         <section className="site-control-card" aria-live="polite">
           <div className="site-control-mark" aria-hidden="true">G</div>
-          <span className="site-control-eyebrow">{content?.eyebrow || "CHECKING SITE STATUS"}</span>
-          <h1>{content?.title || "GameOnix"}</h1>
-          <p>{content ? (siteControl.message || content.description) : "Checking whether the site is available. Content will appear once the status is confirmed."}</p>
-          <div className="site-control-status"><span /> {content ? "We’ll be back soon" : statusUnavailable ? "Retrying connection…" : "Connecting securely…"}</div>
-          <small>{content ? "This page will update automatically." : "This page will retry automatically."}</small>
+          <span className="site-control-eyebrow">{content.eyebrow}</span>
+          <h1>{content.title}</h1>
+          <p>{siteControl.message || content.description}</p>
+          <div className="site-control-status"><span /> We’ll be back soon</div>
+          <small>This page will update automatically.</small>
         </section>
       </main>
     );
