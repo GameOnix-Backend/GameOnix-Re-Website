@@ -47,6 +47,10 @@ function compareGameIdsDescending(first, second) {
   return 0;
 }
 
+function compareAddedAtDescending(first, second) {
+  return (getAddedAt(second) || 0) - (getAddedAt(first) || 0);
+}
+
 function normalizePlatform(value) {
   const platform = String(value || "").trim().toLowerCase();
 
@@ -240,7 +244,7 @@ function Home() {
     return games
       .filter((game) => !isUpdatedGame(game) && getAddedAt(game) !== null)
       .slice()
-      .sort(compareGameIdsDescending);
+      .sort(compareAddedAtDescending);
   }, [games]);
 
   const recentlyUpdatedGames = useMemo(() => {
