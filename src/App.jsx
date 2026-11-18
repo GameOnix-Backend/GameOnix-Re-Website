@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
@@ -21,14 +22,93 @@ import Support from "./pages/Support";
 import ReviewsPage from "./pages/reviews";
 
 import PageTitle from "./components/PageTitle";
+import "./style/site-control.css";
+
+const SITE_STATUS_URL =
+  "https://gameonix-backend.vercel.app/api/auth/me?siteStatus=1";
+
+const SITE_MODE_CONTENT = {
+  maintenance: {
+    eyebrow: "PLANNED MAINTENANCE",
+    title: "GameOnix is getting a tune-up",
+    description: "We paused the site while we work on improvements. Please check back soon.",
+  },
+  emergency: {
+    eyebrow: "TEMPORARY SERVICE PAUSE",
+    title: "GameOnix is temporarily unavailable",
+    description: "We paused the site while we resolve an unexpected issue.",
+  },
+  upgrade: {
+    eyebrow: "SITE UPDATE IN PROGRESS",
+    title: "A new version is on its way",
+    description: "GameOnix is offline while we install an update. Please check back shortly.",
+  },
+};
+
+function SiteStatusGate({ children }) {
+  const [siteControl, setSiteControl] = useState(null);
+  const [statusUnavailable, setStatusUnavailable] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      try {
+        const response = await fetch(SITE_STATUS_URL, {
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("Site status unavailable");
+        const status = await response.json();
+        if (!["online", ...Object.keys(SITE_MODE_CONTENT)].includes(status.mode)) {
+          throw new Error("Invalid site status");
+        }
+        if (active) {
+          setSiteControl(status);
+          setStatusUnavailable(false);
+        }
+      } catch {
+        // Keep protected content hidden until the site status can be confirmed.
+        if (active) setStatusUnavailable(true);
+      }
+    };
+
+    void refresh();
+    const interval = window.setInterval(refresh, 15000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
+
+  const content = siteControl ? SITE_MODE_CONTENT[siteControl.mode] : null;
+  if (!siteControl || content) {
+    return (
+      <main className={`site-control-screen is-${siteControl?.mode || "checking"}`}>
+        <section className="site-control-card" aria-live="polite">
+          <div className="site-control-mark" aria-hidden="true">G</div>
+          <span className="site-control-eyebrow">{content?.eyebrow || "CHECKING SITE STATUS"}</span>
+          <h1>{content?.title || "GameOnix"}</h1>
+          <p>{content ? (siteControl.message || content.description) : "Checking whether the site is available. Content will appear once the status is confirmed."}</p>
+          <div className="site-control-status"><span /> {content ? "We’ll be back soon" : statusUnavailable ? "Retrying connection…" : "Connecting securely…"}</div>
+          <small>{content ? "This page will update automatically." : "This page will retry automatically."}</small>
+        </section>
+      </main>
+    );
+  }
+
+  return children;
+}
 
 function App() {
   return (
     <AuthProvider>
-      <PageTitle />
+      <SiteStatusGate>
+        <PageTitle />
 
-      <Routes>
-        <Route element={<MainLayout />}>
+        <Routes>
+          <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/library" element={<Library />} />
@@ -53,8 +133,9 @@ function App() {
           />
 
           <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+          </Route>
+        </Routes>
+      </SiteStatusGate>
     </AuthProvider>
   );
 }
