@@ -186,19 +186,14 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: #191b25;
+    background: radial-gradient(ellipse at 50% 38%, #252630 0%, #111218 76%);
 }
 
 .library-game-poster > img {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 300ms ease;
-}
-
-.library-game-card:hover .library-game-poster > img {
-    transform: scale(1.045);
+    object-fit: contain;
 }
 
 /* Saved badge */

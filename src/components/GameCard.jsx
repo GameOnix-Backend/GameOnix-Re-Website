@@ -55,6 +55,8 @@ function GameCard({ game, badgeType = "", className = "" }) {
 
   // عرض جميع الأنواع الموجودة في gameTypes
   const gameCategories = getGameCategories(game);
+  const visibleCategories = gameCategories.slice(0, 4);
+  const hiddenCategoryCount = gameCategories.length - visibleCategories.length;
 
   const fileTypeLabel = capitalizeFirstLetter(game?.fileType);
   const imageFailed = failedPoster === poster;
@@ -96,7 +98,7 @@ function GameCard({ game, badgeType = "", className = "" }) {
             {platformLabel}
           </span>
 
-          {gameCategories.map((category, index) => (
+          {visibleCategories.map((category, index) => (
             <span
               className="game-card-category"
               key={`${category}-${index}`}
@@ -105,6 +107,16 @@ function GameCard({ game, badgeType = "", className = "" }) {
               {capitalizeFirstLetter(category)}
             </span>
           ))}
+
+          {hiddenCategoryCount > 0 && (
+            <span
+              className="game-card-category game-card-category-count"
+              title={gameCategories.slice(4).join(", ")}
+              aria-label={`${hiddenCategoryCount} more categories`}
+            >
+              +{hiddenCategoryCount}
+            </span>
+          )}
 
           {fileTypeLabel && (
             <span
