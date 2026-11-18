@@ -38,21 +38,14 @@ import GameCard from "../components/GameCard";
 import { getGameCategories } from "../utils/game-categories";
 import { getAddonList } from "../utils/addons";
 import { GameReviews } from "./reviews";
+import { useGameCatalog } from "../hooks/useGameCatalog";
 
 import "./../style/game-details-style.css";
-
-const DATA_URL =
-    "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
 
 const BANNERS_BASE_URL =
     "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/images/games/banners/";
 const GAME_REPORT_API_URL =
     "https://gameonixfav.vercel.app/api/game-report";
-
-function getGameList(data) {
-    if (Array.isArray(data)) return data;
-    return Array.isArray(data?.games) ? data.games : [];
-}
 
 function RequirementsPanel({ game }) {
     const requirements = game?.requirements && typeof game.requirements === "object"
@@ -183,12 +176,12 @@ function isLoginError(err) {
 function GameDetails() {
     const { slug } = useParams();
     const { user } = useAuth();
+    const { games: allGames, loading: catalogLoading, error: catalogError } = useGameCatalog();
 
     const thumbnailsRef = useRef(null);
     const reportDescriptionRef = useRef(null);
 
     const [game, setGame] = useState(null);
-    const [allGames, setAllGames] = useState([]);
     const [relatedGames, setRelatedGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -231,60 +224,30 @@ function GameDetails() {
         setRelatedGames(game && allGames.length ? chooseRelatedGames(game, allGames) : []);
     }, [game, allGames]);
 
-    // Load game details.
+    // Keep game details and related games in sync with the shared catalog.
     useEffect(() => {
-        const controller = new AbortController();
-
-        async function loadGame() {
-            try {
-                setLoading(true);
-                setError("");
-                setGame(null);
-                setFailedImages([]);
-                setSelectedImage(0);
-                setActiveTab("overview");
-
-                const dataUrl = new URL(DATA_URL);
-                dataUrl.searchParams.set("_", String(Date.now()));
-                const response = await fetch(dataUrl, {
-                    signal: controller.signal,
-                    cache: "no-store",
-                });
-
-                if (!response.ok) {
-                    throw new Error("Couldn't load games.");
-                }
-
-                const data = await response.json();
-
-                const gameList = getGameList(data);
-                setAllGames(gameList);
-                const found = gameList.find((item) => item.slug === slug);
-
-                if (!found) {
-                    throw new Error("Game not found.");
-                }
-
-                setGame(found);
-                if (viewedSlug.current !== found.slug) {
-                    viewedSlug.current = found.slug;
-                    void recordGameActivity(found.slug, "view").catch(() => {});
-                }
-            } catch (err) {
-                if (err.name !== "AbortError") {
-                    setError(err.message || "Something went wrong.");
-                }
-            } finally {
-                if (!controller.signal.aborted) {
-                    setLoading(false);
-                }
-            }
+        if (catalogLoading) return;
+        if (catalogError && !allGames.length) {
+            setError("Couldn't load games.");
+            setLoading(false);
+            return;
         }
 
-        loadGame();
+        const found = allGames.find((item) => item.slug === slug);
+        if (!found) {
+            setError("Game not found.");
+            setLoading(false);
+            return;
+        }
 
-        return () => controller.abort();
-    }, [slug]);
+        setError("");
+        setGame(found);
+        setLoading(false);
+        if (viewedSlug.current !== found.slug) {
+            viewedSlug.current = found.slug;
+            void recordGameActivity(found.slug, "view").catch(() => {});
+        }
+    }, [slug, allGames, catalogLoading, catalogError]);
 
     useEffect(() => {
         let active = true;

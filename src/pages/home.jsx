@@ -14,6 +14,7 @@ import {
   faXbox,
 } from "@fortawesome/free-brands-svg-icons";
 import GameCard from "../components/GameCard";
+import { useGameCatalog } from "../hooks/useGameCatalog";
 import { getGameCategories } from "../utils/game-categories";
 import {
   getGameBadgeType,
@@ -22,9 +23,6 @@ import {
 } from "../utils/game-release";
 
 import "./../style/home-style.css";
-
-const GAMES_DATA_URL =
-  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
 
 const GAMES_PER_SECTION = 20;
 function getAddedAt(game) {
@@ -35,12 +33,6 @@ function getAddedAt(game) {
   const timestamp = Date.parse(value);
 
   return Number.isFinite(timestamp) ? timestamp : null;
-}
-
-function getGameList(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.games)) return data.games;
-  return [];
 }
 
 function compareGameIdsDescending(first, second) {
@@ -233,52 +225,8 @@ function GamesCarousel({ games, platform, category, now }) {
 }
 
 function Home() {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { games, loading, error, refreshGames } = useGameCatalog();
   const [clock, setClock] = useState(Date.now());
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadGames() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const response = await fetch(GAMES_DATA_URL, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch games data");
-        }
-
-        const data = await response.json();
-
-        setGames(
-          getGameList(data).filter(
-            (game) => game?.slug && game?.title
-          )
-        );
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Error loading games:", err);
-          setError(
-            "Couldn't load games right now. Please try again."
-          );
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadGames();
-
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -366,7 +314,7 @@ function Home() {
           <button
             type="button"
             className="home-retry-button"
-            onClick={() => window.location.reload()}
+            onClick={() => void refreshGames()}
           >
             <FontAwesomeIcon icon={faRotate} />
             Try again

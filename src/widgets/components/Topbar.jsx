@@ -17,6 +17,7 @@ import {
     faMobileScreenButton,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../../context/AuthContext";
+import { useGameCatalog } from "../../hooks/useGameCatalog";
 
 import {
     faMagnifyingGlass,
@@ -35,8 +36,6 @@ import { getGameCategories } from "../../utils/game-categories";
 
 import "./../../style/topbar.css";
 
-const GAMES_DATA_URL =
-    "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
 const WALLET_NOTIFICATIONS_URL =
     "https://gameonixfav.vercel.app/api/auth/wallet-notifications";
 const WALLET_API_URL = "https://gameonixfav.vercel.app/api/auth/wallet";
@@ -178,9 +177,8 @@ function TopbarAvatar({ avatar, name }) {
 
 function Topbar() {
     const [search, setSearch] = useState("");
-    const [games, setGames] = useState([]);
+    const { games, loading: loadingGames } = useGameCatalog();
     const [searchOpen, setSearchOpen] = useState(false);
-    const [loadingGames, setLoadingGames] = useState(true);
     const [openAccountPanel, setOpenAccountPanel] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [paymentMethods, setPaymentMethods] = useState([]);
@@ -481,43 +479,6 @@ function Topbar() {
             setLoggingOut(false);
         }
     }
-
-    useEffect(() => {
-        const controller = new AbortController();
-
-        async function loadGames() {
-            try {
-                const response = await fetch(GAMES_DATA_URL, {
-                    signal: controller.signal,
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to load games");
-                }
-
-                const data = await response.json();
-                const list = Array.isArray(data) ? data : data?.games;
-
-                setGames(
-                    (Array.isArray(list) ? list : []).filter(
-                        (game) => game?.slug && game?.title
-                    )
-                );
-            } catch (error) {
-                if (error.name !== "AbortError") {
-                    console.error("Could not load search data:", error);
-                }
-            } finally {
-                if (!controller.signal.aborted) {
-                    setLoadingGames(false);
-                }
-            }
-        }
-
-        loadGames();
-
-        return () => controller.abort();
-    }, []);
 
     useEffect(() => {
         let active = true;

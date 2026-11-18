@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,63 +8,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import GameCard from "../components/GameCard";
+import { useGameCatalog } from "../hooks/useGameCatalog";
 import "./../style/search-results-style.css";
 import { getGameCategories } from "../utils/game-categories";
-
-const GAMES_DATA_URL =
-  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
-
-function getGameList(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.games)) return data.games;
-  return [];
-}
 
 function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadGames() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const response = await fetch(GAMES_DATA_URL, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load games");
-        }
-
-        const data = await response.json();
-
-        setGames(
-          getGameList(data).filter((game) => game?.slug && game?.title)
-        );
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Search results error:", err);
-          setError("Couldn't load games right now. Please try again.");
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadGames();
-
-    return () => controller.abort();
-  }, []);
+  const { games, loading, error, refreshGames } = useGameCatalog();
 
   const filteredGames = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -151,7 +103,7 @@ function SearchResults() {
             <button
               type="button"
               className="search-results-retry"
-              onClick={() => window.location.reload()}
+              onClick={() => void refreshGames()}
             >
               <FontAwesomeIcon icon={faRotate} />
               Try again

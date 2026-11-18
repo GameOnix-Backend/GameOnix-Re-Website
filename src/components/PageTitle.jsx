@@ -1,9 +1,7 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
-const GAMES_DATA_URL =
-  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
+import { useGameCatalog } from "../hooks/useGameCatalog";
 
 const pageTitles = {
   "/": "Discover and Explore Games",
@@ -86,38 +84,7 @@ function upsertCanonical(href) {
 
 function PageTitle() {
   const { pathname, search } = useLocation();
-  const [games, setGames] = useState([]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadGames() {
-      try {
-        const response = await fetch(GAMES_DATA_URL, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load games");
-        }
-
-        const data = await response.json();
-        const list = Array.isArray(data) ? data : data?.games;
-
-        if (!controller.signal.aborted) {
-          setGames(Array.isArray(list) ? list : []);
-        }
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error("Could not load game titles:", error);
-        }
-      }
-    }
-
-    loadGames();
-
-    return () => controller.abort();
-  }, []);
+  const { games } = useGameCatalog();
 
   useEffect(() => {
     let title = pageTitles[pathname];

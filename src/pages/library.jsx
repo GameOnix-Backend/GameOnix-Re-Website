@@ -3,20 +3,14 @@ import { Link } from "react-router-dom";
 import { getFavorites } from "../api/favorites";
 import { getFollows, removeFollow } from "../api/follows";
 import GameCard from "../components/GameCard";
+import { useGameCatalog } from "../hooks/useGameCatalog";
 import "./../style/library-style.css";
-
-const DATA_URL =
-  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/games-data.json";
-
-function getGameList(data) {
-  if (Array.isArray(data)) return data;
-  return Array.isArray(data?.games) ? data.games : [];
-}
 
 function Library() {
   const [games, setGames] = useState([]);
-  const [catalogGames, setCatalogGames] = useState([]);
-  const [follows, setFollows] = useState([]);
+  const { games: catalogGames } = useGameCatalog();
+  const [favoriteSlugs, setFavoriteSlugs] = useState([]);
+  const [followEntries, setFollowEntries] = useState([]);
   const [activeCollection, setActiveCollection] = useState("favorites");
   const [selectedFollowSlug, setSelectedFollowSlug] = useState("");
   const [loading, setLoading] = useState(true);
@@ -30,33 +24,19 @@ function Library() {
         setLoading(true);
         setError("");
 
-        const [favoritesData, followsData, response] = await Promise.all([
+        const [favoritesData, followsData] = await Promise.all([
           getFavorites(),
           getFollows(),
-          fetch(DATA_URL),
         ]);
-
-        if (!response.ok) {
-          throw new Error("Couldn't load game details.");
-        }
 
         const favoriteSlugs = Array.isArray(favoritesData.favorites)
           ? favoritesData.favorites
           : [];
-
-        const data = await response.json();
-        const allGames = getGameList(data);
-
-        const favoriteGames = favoriteSlugs
-          .map((slug) => allGames.find((game) => game.slug === slug))
-          .filter(Boolean);
-
         const followed = Array.isArray(followsData.follows) ? followsData.follows : [];
 
         if (active) {
-          setGames(favoriteGames);
-          setCatalogGames(allGames);
-          setFollows(followed.map((follow) => ({ ...follow, game: allGames.find((game) => game.slug === follow.slug) })).filter((follow) => follow.game));
+          setFavoriteSlugs(favoriteSlugs);
+          setFollowEntries(followed);
         }
       } catch (err) {
         if (active) {
@@ -76,6 +56,14 @@ function Library() {
     };
   }, []);
 
+  useEffect(() => {
+    setGames(favoriteSlugs.map((slug) => catalogGames.find((game) => game.slug === slug)).filter(Boolean));
+  }, [favoriteSlugs, catalogGames]);
+
+  const follows = followEntries
+    .map((follow) => ({ ...follow, game: catalogGames.find((game) => game.slug === follow.slug) }))
+    .filter((follow) => follow.game);
+
   const followedGames = follows.map((item) => item.game);
   const updateAlerts = follows.filter(({ followedAt, addonCount, game }) => {
     const updatedAfterFollow = Date.parse(game.createdAt || "") > Date.parse(followedAt || "");
@@ -88,7 +76,7 @@ function Library() {
     try {
       const data = await removeFollow(slug);
       const updated = Array.isArray(data.follows) ? data.follows : follows.filter((item) => item.slug !== slug);
-      setFollows(updated.map((follow) => ({ ...follow, game: catalogGames.find((game) => game.slug === follow.slug) })).filter((item) => item.game));
+      setFollowEntries(updated);
       if (selectedFollowSlug === slug) setSelectedFollowSlug("");
     } catch (err) {
       setError(err.message || "Couldn't update followed games.");
