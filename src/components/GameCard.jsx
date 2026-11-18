@@ -69,16 +69,13 @@ function GameCard({ game, badgeType = "", className = "" }) {
     >
       <div className="game-card-poster">
         {poster && !imageFailed ? (
-          <>
-            <img className="game-card-poster-backdrop" src={poster} alt="" aria-hidden="true" />
-            <img
-              className="game-card-poster-image"
-              src={poster}
-              alt={`${title} poster`}
-              loading="lazy"
-              onError={() => setFailedPoster(poster)}
-            />
-          </>
+          <img
+            className="game-card-poster-image"
+            src={poster}
+            alt={`${title} poster`}
+            loading="lazy"
+            onError={() => setFailedPoster(poster)}
+          />
         ) : (
           <div className="game-card-placeholder">
             <FontAwesomeIcon icon={faGamepad} />
