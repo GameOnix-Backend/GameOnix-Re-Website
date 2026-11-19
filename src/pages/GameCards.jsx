@@ -250,11 +250,6 @@ function GameCards() {
   const isGiftCardProduct = isDigitalCodeProduct || ["gift card", "gift cards"].includes(
     String(selectedProduct?.type || "").trim().toLowerCase()
   );
-  useEffect(() => {
-    if (isDigitalCodeProduct && selectedPayment === WALLET_PAYMENT_ID) {
-      setSelectedPayment(paymentMethods.find((method) => method.av)?.name || "");
-    }
-  }, [isDigitalCodeProduct, paymentMethods, selectedPayment]);
   const canSendGift = selectedProduct?.gift === true;
   const isGiftOrder = canSendGift && isGift;
   const giftEmailSuggestion = isGiftOrder
@@ -683,11 +678,6 @@ function GameCards() {
 
     if (!selectedPaymentMethod?.av) {
       setCheckoutMessage("وسيلة الدفع المختارة غير متاحة حاليًا.");
-      return;
-    }
-
-    if (isDigitalCodeProduct && selectedPaymentMethod?.isWallet) {
-      setCheckoutMessage("Choose a payment method for this digital code.");
       return;
     }
 
@@ -1764,7 +1754,7 @@ function GameCards() {
                           )}
                         </button>
                       ))}
-                      {!isDigitalCodeProduct && <button
+                      <button
                         type="button"
                         key={WALLET_PAYMENT_ID}
                         disabled={!walletPaymentMethod.av}
@@ -1808,7 +1798,7 @@ function GameCards() {
                             <FontAwesomeIcon icon={faCheck} />
                           </span>
                         )}
-                      </button>}
+                      </button>
                     </div>
 
                   <div className="gc-security-row">
