@@ -3086,14 +3086,6 @@
 .gc-digital-code-overlay-meta strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gc-digital-code-card:hover .gc-digital-code-overlay,
 .gc-digital-code-card .gc-product-click:focus-visible .gc-digital-code-overlay { opacity: 1; }
-.gc-digital-variant-picker { display: flex; gap: 7px; padding: 9px; border-top: 1px solid rgba(255, 255, 255, .07); background: rgba(15, 14, 19, .92); }
-.gc-digital-variant-picker button { flex: 1 1 0; min-width: 0; border: 1px solid rgba(190, 168, 235, .24); border-radius: 8px; padding: 7px 8px; color: #aaa3b9; background: rgba(255, 255, 255, .035); font-size: 10px; font-weight: 800; cursor: pointer; transition: color .16s, border-color .16s, background .16s, transform .16s; }
-.gc-digital-variant-picker button:hover { transform: translateY(-1px); border-color: rgba(199, 173, 255, .62); color: #f4efff; }
-.gc-digital-variant-picker button.active { border-color: rgba(184, 145, 255, .72); color: #fff; background: linear-gradient(135deg, rgba(116, 78, 183, .62), rgba(80, 52, 133, .48)); box-shadow: inset 0 1px rgba(255, 255, 255, .1); }
-.gc-digital-variant-picker button:focus-visible { outline: 2px solid #c5a9ff; outline-offset: 2px; }
-.gc-digital-variant-picker button svg { margin-right: 5px; font-size: 12px; vertical-align: -1px; }
-.gc-nintendo-platform-mark { width: 14px; height: 14px; display: inline-grid; place-items: center; margin-right: 5px; border: 1.5px solid currentColor; border-radius: 4px; font-size: 8px; font-weight: 950; line-height: 1; vertical-align: -1px; }
-
 .gc-checkout-platform-picker { flex: 0 0 auto; padding: 13px 20px 14px; border-bottom: 1px solid #2b2b30; background: linear-gradient(100deg, rgba(91, 63, 137, .12), rgba(18, 18, 22, .15)); }
 .gc-checkout-platform-picker > .gc-checkout-label { margin-bottom: 9px; }
 .gc-checkout-platform-options { display: flex; flex-wrap: wrap; gap: 9px; }
@@ -3166,7 +3158,6 @@
     pointer-events: none;
 }
 .gc-digital-platform-badge svg { margin-right: 4px; font-size: 10px; vertical-align: -1px; }
-.gc-digital-platform-badge .gc-nintendo-platform-mark { width: 11px; height: 11px; margin-right: 4px; font-size: 7px; }
 .gc-digital-platform-icons { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 7px; border: 1px solid rgba(222, 207, 255, .36); border-radius: 999px; padding: 5px 9px; color: #f4edff; background: rgba(20, 15, 31, .88); }
 .gc-digital-platform-icon-item { display: inline-flex; align-items: center; gap: 7px; line-height: 1; }
 .gc-digital-platform-icon-item > svg { font-size: 12px; }
