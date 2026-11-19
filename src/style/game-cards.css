@@ -3061,7 +3061,7 @@
 .gc-code-contact-card p { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: #9ca7bc; font-size: 11px; }
 .gc-code-contact-card bdi, .gc-code-contact-card a { color: #d1c6ff; font-weight: 650; text-decoration: none; }
 
-.gc-product-image { height: auto; aspect-ratio: 2 / 3; }
+.gc-digital-code-card .gc-product-image { height: auto; aspect-ratio: 2 / 3; }
 .gc-digital-code-card .gc-product-info { display: none; }
 .gc-digital-code-overlay {
     position: absolute;
