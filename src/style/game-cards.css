@@ -3062,8 +3062,9 @@
 .gc-code-contact-card bdi, .gc-code-contact-card a { color: #d1c6ff; font-weight: 650; text-decoration: none; }
 
 .gc-digital-code-card .gc-product-image { height: auto; aspect-ratio: 2 / 3; }
+.gc-digital-code-card:not(.gc-popular-card) > .gc-product-click { height: auto; }
 .gc-digital-code-card .gc-product-image > .gc-image-wrap { padding: 0; }
-.gc-digital-code-card .gc-product-image > .gc-image-wrap img { object-fit: cover; transform: scale(1.08); }
+.gc-digital-poster { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .gc-digital-code-card .gc-product-info { display: none; }
 .gc-digital-code-overlay {
     position: absolute;

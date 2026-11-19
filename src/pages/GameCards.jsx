@@ -1171,10 +1171,9 @@ function GameCards() {
                               }
                             >
                               <div className="gc-product-image">
-                                <ProductImage
-                                  src={getImageUrl(product.image)}
-                                  alt={product.name}
-                                />
+                                {getProductKind(product) === "digital-code"
+                                  ? <img className="gc-digital-poster" src={getImageUrl(product.image)} alt={product.name} loading="lazy" />
+                                  : <ProductImage src={getImageUrl(product.image)} alt={product.name} />}
                                 {getProductKind(product) === "digital-code" && (
                                   <div className="gc-digital-code-overlay">
                                     <div className="gc-digital-code-overlay-meta">
@@ -1286,10 +1285,9 @@ function GameCards() {
                               }
                             >
                               <div className="gc-product-image">
-                                <ProductImage
-                                  src={getImageUrl(product.image)}
-                                  alt={product.name}
-                                />
+                                {isDigitalCode
+                                  ? <img className="gc-digital-poster" src={getImageUrl(product.image)} alt={product.name} loading="lazy" />
+                                  : <ProductImage src={getImageUrl(product.image)} alt={product.name} />}
 
                                 {isDigitalCode && (
                                   <div className="gc-digital-code-overlay">
