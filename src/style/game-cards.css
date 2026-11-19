@@ -3092,12 +3092,15 @@
     border-radius: 14px;
 }
 .gc-popular-card.gc-digital-code-card .gc-product-image {
+    display: block;
+    width: 100%;
     height: auto;
     aspect-ratio: 2 / 3;
-    padding: 0;
-    place-items: stretch;
+    padding: 0 !important;
 }
 .gc-popular-card.gc-digital-code-card .gc-product-image > .gc-image-wrap {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     margin: 0;
