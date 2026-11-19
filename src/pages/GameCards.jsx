@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   faBolt,
   faFire,
@@ -213,6 +213,7 @@ function PaymentMethodLogo({ method }) {
 function GameCards() {
   const { user, authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { getSuggestion, getLiveSuggestion, keepTypedEmail } =
     useEmailTypoGuard();
   const [catalog, setCatalog] = useState([]);
@@ -338,6 +339,22 @@ function GameCards() {
     loadCatalog();
     loadPaymentMethods();
   }, []);
+
+  useEffect(() => {
+    const productId = new URLSearchParams(location.search).get("digitalCode");
+    if (!productId || !catalog.length) return;
+
+    const product = catalog.find(
+      (item) => String(item.id) === productId && getProductKind(item) === "digital-code"
+    );
+    if (!product) return;
+
+    setActiveCategory("All");
+    setSearch("");
+    document.getElementById("gc-digital-codes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    void openProduct(product);
+    navigate(`${location.pathname}#gc-digital-codes`, { replace: true });
+  }, [catalog, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     void recordGameActivity("shopping", "shopping-view").catch(() => {});

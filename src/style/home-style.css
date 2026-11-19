@@ -112,8 +112,11 @@
 .home-digital-package del { grid-column: 1 / -1; color: #8d8799; font-size: 9px; }
 .home-digital-package.is-out-of-stock { opacity: .55; }
 .home-digital-packages > p { margin: 0; color: #a7a0b3; font-size: 11px; }
-.home-digital-hero-cta { width: fit-content; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; border: 1px solid rgba(209, 190, 255, .36); border-radius: 9px; padding: 10px 14px; color: #fff; background: linear-gradient(135deg, #7c4ed3, #5432a1); box-shadow: 0 9px 24px rgba(88, 52, 161, .25); font-size: 11px; font-weight: 800; text-decoration: none; transition: transform .18s, filter .18s; }
-.home-digital-hero-cta:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.home-digital-hero-cta { position: relative; width: fit-content; display: inline-flex; align-items: center; gap: 12px; margin-top: 15px; border: 1px solid rgba(228, 214, 255, .5); border-radius: 11px; padding: 11px 15px 11px 17px; color: #fff; background: linear-gradient(135deg, rgba(143, 97, 235, .98), rgba(82, 48, 157, .96)); box-shadow: 0 8px 24px rgba(88, 52, 161, .35), inset 0 1px rgba(255, 255, 255, .18); font-size: 11px; font-weight: 850; text-decoration: none; transition: transform .18s ease, filter .18s ease, box-shadow .18s ease; }
+.home-digital-hero-cta svg { transition: transform .18s ease; }
+.home-digital-hero-cta:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 12px 28px rgba(88, 52, 161, .46), inset 0 1px rgba(255, 255, 255, .24); }
+.home-digital-hero-cta:hover svg { transform: translateX(3px); }
+.home-digital-hero-cta:focus-visible, .home-digital-hero-controls button:focus-visible { outline: 2px solid #e4d6ff; outline-offset: 3px; }
 .home-digital-hero-art { position: relative; z-index: 1; height: 340px; display: grid; place-items: center; }
 .home-digital-hero-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 32px rgba(0, 0, 0, .55)); }
 .home-digital-hero-glow { position: absolute; right: 6%; top: 50%; width: 320px; height: 320px; border-radius: 50%; background: rgba(130, 84, 226, .16); filter: blur(80px); pointer-events: none; }
@@ -122,10 +125,11 @@
 .home-digital-hero-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
 .home-digital-hero-tags span { border: 1px solid rgba(209, 190, 255, .28); border-radius: 999px; padding: 5px 9px; color: #dfd1ff; background: rgba(29, 24, 43, .72); font-size: 9px; font-weight: 750; }
 .home-digital-hero-description { max-width: 550px; margin: 10px 0 0; color: #c3bdcf; font-size: 11px; line-height: 1.65; }
-.home-digital-hero-controls { display: flex; align-items: center; gap: 6px; margin-top: 13px; }
-.home-digital-hero-controls button { min-width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(207, 190, 255, .25); border-radius: 999px; padding: 0 6px; color: #ddd0ff; background: rgba(12, 13, 19, .54); cursor: pointer; }
-.home-digital-hero-controls button[aria-pressed] { min-width: 8px; width: 8px; height: 8px; border: 0; padding: 0; background: rgba(229, 218, 255, .42); }
-.home-digital-hero-controls button[aria-pressed="true"] { width: 21px; border-radius: 99px; background: #b39aff; }
+.home-digital-hero-controls { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+.home-digital-hero-controls button { min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(225, 211, 255, .3); border-radius: 999px; padding: 0 8px; color: #f0eaff; background: rgba(18, 15, 27, .66); box-shadow: inset 0 1px rgba(255,255,255,.08); cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+.home-digital-hero-controls button:hover { transform: translateY(-1px); border-color: rgba(225, 211, 255, .65); background: rgba(105, 73, 166, .76); }
+.home-digital-hero-controls button[aria-pressed] { min-width: 8px; width: 8px; height: 8px; border: 0; padding: 0; background: rgba(229, 218, 255, .58); }
+.home-digital-hero-controls button[aria-pressed="true"] { width: 21px; border-radius: 99px; background: #c4a9ff; box-shadow: 0 0 12px rgba(196, 169, 255, .48); }
 
 .home-platform-heading {
     display: flex;

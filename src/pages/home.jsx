@@ -109,7 +109,7 @@ function HomeDigitalCodeHero() {
   const startingPrice = prices.length ? Math.min(...prices) : null;
   const heroImage = getDigitalCodeImageUrl(product.homeHeroImage);
   const heroBackground = heroImage
-    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .96) 0%, rgba(15, 16, 23, .82) 48%, rgba(15, 16, 23, .34) 100%), url("${heroImage}")` }
+    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .64) 0%, rgba(15, 16, 23, .49) 14%, rgba(15, 16, 23, .28) 30%, rgba(15, 16, 23, .11) 47%, rgba(15, 16, 23, 0) 65%), linear-gradient(0deg, rgba(15, 16, 23, .16), rgba(15, 16, 23, 0) 54%), url("${heroImage}")` }
     : undefined;
   const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
   const heroTags = Array.isArray(product.homeHeroTags) ? product.homeHeroTags.filter(Boolean) : [];
@@ -135,7 +135,7 @@ function HomeDigitalCodeHero() {
             </div>
           )) : <p>No packages available yet.</p>}
         </div>
-        <Link className="home-digital-hero-cta" to="/shopping/game-cards">
+        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?digitalCode=${encodeURIComponent(product.id)}#gc-digital-codes`}>
           View digital code <FontAwesomeIcon icon={faChevronRight} />
         </Link>
         {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">
