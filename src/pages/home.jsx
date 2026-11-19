@@ -25,6 +25,106 @@ import {
 import "./../style/home-style.css";
 
 const GAMES_PER_SECTION = 20;
+const DIGITAL_CODES_URL =
+  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/recharge.json";
+const DIGITAL_CODE_ASSET_BASE =
+  "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/";
+
+function getDigitalCodeImageUrl(value) {
+  const image = String(value || "").trim();
+  if (!image) return "";
+  if (/^https?:\/\//i.test(image)) return image;
+  return DIGITAL_CODE_ASSET_BASE + image.replace(/^\.\.\//, "").replace(/^\/+/, "");
+}
+
+function getDigitalCodePlatform(product) {
+  const platform = String(product?.platform || "").trim().toLowerCase();
+  if (platform === "playstation") {
+    return String(product?.platformVersion || "ps5").trim().toUpperCase();
+  }
+  if (platform === "pc") return "PC";
+  if (platform === "xbox") return "XBOX";
+  if (platform === "nintendo-switch") return "NINTENDO SWITCH";
+  return platform === "other" ? "OTHER PLATFORM" : "DIGITAL CODE";
+}
+
+function formatDigitalCodePrice(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "Price unavailable";
+  return new Intl.NumberFormat("en-EG", {
+    style: "currency",
+    currency: "EGP",
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+function HomeDigitalCodeHero() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch(DIGITAL_CODES_URL, { cache: "no-cache" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Digital code catalog unavailable");
+        return response.json();
+      })
+      .then((catalog) => {
+        if (active && Array.isArray(catalog)) {
+          setProducts(catalog.filter((item) => item?.kind === "digital-code" && item?.able !== false));
+        }
+      })
+      .catch(() => {});
+
+    return () => { active = false; };
+  }, []);
+
+  const product = products.find((item) => item.featuredOnHome) || products[0];
+  if (!product) {
+    return (
+      <section className="home-welcome">
+        <div className="home-welcome-copy">
+          <span className="home-eyebrow"><FontAwesomeIcon icon={faGamepad} />YOUR GAMING DESTINATION</span>
+          <h1>Find your next<span> adventure.</span></h1>
+          <p>Explore your library, discover new worlds, and find your next favorite game.</p>
+        </div>
+        <div className="home-welcome-art" aria-hidden="true"><FontAwesomeIcon icon={faGamepad} /></div>
+      </section>
+    );
+  }
+
+  const packages = (product.packs || []).filter((pack) => pack?.able !== false);
+  const prices = packages.map((pack) => Number(pack?.price)).filter((price) => Number.isFinite(price) && price >= 0);
+  const startingPrice = prices.length ? Math.min(...prices) : null;
+
+  return (
+    <section className="home-digital-hero" aria-label={`Featured digital code: ${product.name}`}>
+      <div className="home-digital-hero-copy">
+        <span className="home-digital-hero-kicker">FEATURED DIGITAL CODE</span>
+        <h1>{product.name}</h1>
+        <div className="home-digital-hero-meta">
+          {product.publisher && <span>{product.publisher}</span>}
+          <span>{getDigitalCodePlatform(product)}</span>
+        </div>
+        {startingPrice !== null && <p className="home-digital-starting-price">Starting from {formatDigitalCodePrice(startingPrice)}</p>}
+        <div className="home-digital-packages" aria-label="Available editions and prices">
+          {packages.length ? packages.map((pack, index) => (
+            <div className={`home-digital-package${pack.stock === false ? " is-out-of-stock" : ""}`} key={`${pack.title}-${index}`}>
+              <span>{[pack.title, pack.type].filter(Boolean).join(" ")}</span>
+              <strong>{formatDigitalCodePrice(pack.price)}</strong>
+              {pack.oldPrice && <del>{formatDigitalCodePrice(pack.oldPrice)}</del>}
+            </div>
+          )) : <p>No packages available yet.</p>}
+        </div>
+        <Link className="home-digital-hero-cta" to="/shopping/game-cards">
+          View digital code <FontAwesomeIcon icon={faChevronRight} />
+        </Link>
+      </div>
+      {product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={product.name} /></div>}
+      <div className="home-digital-hero-glow" aria-hidden="true" />
+    </section>
+  );
+}
+
 function getAddedAt(game) {
   const value = game?.createdAt;
 
@@ -339,31 +439,7 @@ function Home() {
 
   return (
     <main className="home-page">
-      <section className="home-welcome">
-        <div className="home-welcome-copy">
-          <span className="home-eyebrow">
-            <FontAwesomeIcon icon={faGamepad} />
-            YOUR GAMING DESTINATION
-          </span>
-
-          <h1>
-            Find your next
-            <span> adventure.</span>
-          </h1>
-
-          <p>
-            Explore your library, discover new worlds, and find your
-            next favorite game.
-          </p>
-        </div>
-
-        <div
-          className="home-welcome-art"
-          aria-hidden="true"
-        >
-          <FontAwesomeIcon icon={faGamepad} />
-        </div>
-      </section>
+      <HomeDigitalCodeHero />
 
       {recentlyAddedGames.length > 0 && (
         <GamesCarousel

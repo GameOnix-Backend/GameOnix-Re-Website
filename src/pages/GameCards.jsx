@@ -89,6 +89,18 @@ function getStartingPrice(product) {
   return prices.length ? Math.min(...prices) : null;
 }
 
+function getDigitalPlatformLabel(product) {
+  const platform = String(product?.platform || "").trim().toLowerCase();
+  if (platform === "playstation") {
+    const version = String(product?.platformVersion || "ps5").trim().toUpperCase();
+    return version.startsWith("PS") ? version : `PS ${version}`;
+  }
+  if (platform === "pc") return "PC";
+  if (platform === "xbox") return "XBOX";
+  if (platform === "nintendo-switch") return "NINTENDO SWITCH";
+  return platform === "other" ? "OTHER PLATFORM" : "DIGITAL CODE";
+}
+
 function isPackInStock(pack) {
   return pack?.stock !== false;
 }
@@ -1104,6 +1116,7 @@ function GameCards() {
                                     <small>{product.name}</small>
                                   </div>
                                 )}
+                                {getProductKind(product) === "digital-code" && <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>}
                                 <span className="gc-popular-badge">
                                   <FontAwesomeIcon icon={faFire} /> Popular
                                 </span>
@@ -1216,6 +1229,7 @@ function GameCards() {
                                     <small>{product.name}</small>
                                   </div>
                                 )}
+                                {isDigitalCode && <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>}
 
                                 {productType && (
                                   <span
