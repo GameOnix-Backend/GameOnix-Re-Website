@@ -20,6 +20,7 @@ import {
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlaystation, faWindows, faXbox } from "@fortawesome/free-brands-svg-icons";
 import EmailSuggestion from "../components/EmailSuggestion";
 import { recordGameActivity } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
@@ -100,6 +101,15 @@ function getDigitalPlatformLabel(product) {
   if (platform === "xbox") return "XBOX";
   if (platform === "nintendo-switch") return "NINTENDO SWITCH";
   return platform === "other" ? "OTHER PLATFORM" : "DIGITAL CODE";
+}
+
+function DigitalPlatformIcon({ product }) {
+  const platform = String(product?.platform || "").trim().toLowerCase();
+  if (platform === "playstation") return <FontAwesomeIcon icon={faPlaystation} />;
+  if (platform === "xbox") return <FontAwesomeIcon icon={faXbox} />;
+  if (platform === "pc") return <FontAwesomeIcon icon={faWindows} />;
+  if (platform === "nintendo-switch") return <span className="gc-nintendo-platform-mark" aria-hidden="true">N</span>;
+  return <FontAwesomeIcon icon={faGamepad} />;
 }
 
 function isPackInStock(pack) {
@@ -270,6 +280,14 @@ function GameCards() {
   const giftEmailSuggestion = isGiftOrder
     ? getLiveSuggestion("gift-email", email)
     : null;
+  const selectedProductVariants = useMemo(() => {
+    if (!isDigitalCodeProduct || !selectedProduct?.digitalCodeGroup) return selectedProduct ? [selectedProduct] : [];
+    const group = String(selectedProduct.digitalCodeGroup).trim().toLowerCase();
+    return catalog.filter((product) =>
+      getProductKind(product) === "digital-code" &&
+      String(product.digitalCodeGroup || "").trim().toLowerCase() === group
+    );
+  }, [catalog, isDigitalCodeProduct, selectedProduct]);
 
   async function loadCatalog() {
     setLoading(true);
@@ -1322,7 +1340,7 @@ function GameCards() {
                                 className={String(variant.id) === String(product.id) ? "active" : ""}
                                 aria-pressed={String(variant.id) === String(product.id)}
                                 onClick={() => setSelectedDigitalVariants((current) => ({ ...current, [product.digitalCodeGroupKey]: String(variant.id) }))}
-                              >{getDigitalPlatformLabel(variant)}</button>)}
+                              ><DigitalPlatformIcon product={variant} />{getDigitalPlatformLabel(variant)}</button>)}
                             </div>}
                           </article>
                         );
@@ -1375,6 +1393,23 @@ function GameCards() {
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </header>
+
+            {selectedProductVariants.length > 1 && <section className="gc-checkout-platform-picker" aria-label="Choose a platform">
+              <div className="gc-checkout-label">CHOOSE YOUR PLATFORM</div>
+              <div className="gc-checkout-platform-options">
+                {selectedProductVariants.map((variant) => <button
+                  type="button"
+                  key={variant.id}
+                  className={String(variant.id) === String(selectedProduct.id) ? "active" : ""}
+                  aria-pressed={String(variant.id) === String(selectedProduct.id)}
+                  onClick={() => { setSelectedDigitalVariants((current) => ({ ...current, [String(variant.digitalCodeGroup).trim().toLowerCase()]: String(variant.id) })); void openProduct(variant); }}
+                >
+                  <DigitalPlatformIcon product={variant} />
+                  <span>{getDigitalPlatformLabel(variant)}</span>
+                  <small>{getStartingPrice(variant) === null ? "Price unavailable" : `From ${formatPrice(getStartingPrice(variant))}`}</small>
+                </button>)}
+              </div>
+            </section>}
 
             {authLoading ? (
               <div className="gc-auth-gate" role="status">
