@@ -3088,14 +3088,25 @@
 }
 
 .gc-popular-card.gc-digital-code-card {
+    position: relative;
     flex: 0 0 clamp(150px, 17vw, 205px);
+    aspect-ratio: 2 / 3;
     border-radius: 14px;
 }
+.gc-popular-card.gc-digital-code-card .gc-product-click {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 !important;
+}
 .gc-popular-card.gc-digital-code-card .gc-product-image {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 2 / 3;
+    height: 100%;
+    aspect-ratio: auto;
     padding: 0 !important;
 }
 .gc-popular-card.gc-digital-code-card .gc-product-image > .gc-image-wrap {
