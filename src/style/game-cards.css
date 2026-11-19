@@ -3046,6 +3046,21 @@
     }
 }
 
+.gc-code-contact-card {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0;
+    border: 1px solid #3c355d;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #d8d3ef;
+    background: linear-gradient(135deg, rgba(117, 92, 207, .13), rgba(15, 20, 32, .92));
+}
+
+.gc-code-contact-card strong { color: #eeeaff; font-size: 12px; }
+.gc-code-contact-card p { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: #9ca7bc; font-size: 11px; }
+.gc-code-contact-card bdi, .gc-code-contact-card a { color: #d1c6ff; font-weight: 650; text-decoration: none; }
+
 
 .gc-product-title {
     display: flex;

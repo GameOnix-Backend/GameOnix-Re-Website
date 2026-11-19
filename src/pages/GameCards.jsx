@@ -86,7 +86,7 @@ function isPackInStock(pack) {
 
 function getProductKind(product) {
   const kind = String(product?.kind || "").trim().toLowerCase();
-  if (kind === "game" || kind === "gift-card") return kind;
+  if (kind === "game" || kind === "gift-card" || kind === "digital-code") return kind;
 
   return String(product?.type || "").trim().toLowerCase() === "gift cards"
     ? "gift-card"
@@ -237,7 +237,8 @@ function GameCards() {
     selectedPayment === WALLET_PAYMENT_ID
       ? walletPaymentMethod
       : paymentMethods.find((method) => method.name === selectedPayment);
-  const isGiftCardProduct = ["gift card", "gift cards"].includes(
+  const isDigitalCodeProduct = String(selectedProduct?.kind || "").trim().toLowerCase() === "digital-code";
+  const isGiftCardProduct = isDigitalCodeProduct || ["gift card", "gift cards"].includes(
     String(selectedProduct?.type || "").trim().toLowerCase()
   );
   const canSendGift = selectedProduct?.gift === true;
@@ -400,7 +401,7 @@ function GameCards() {
     [filteredCatalog]
   );
   const gameProducts = filteredCatalog.filter(
-    (product) => getProductKind(product) === "game"
+    (product) => ["game", "digital-code"].includes(getProductKind(product))
   );
   const giftCardProducts = filteredCatalog.filter(
     (product) => getProductKind(product) === "gift-card"
@@ -1778,6 +1779,14 @@ function GameCards() {
                     </span>
                   </div>
                 </section>
+
+                {isDigitalCodeProduct && (
+                  <section className="gc-code-contact-card" aria-label="Digital code payment and contact">
+                    <strong>Complete your digital code order</strong>
+                    {selectedProduct.paymentNumber && <p>Payment number <bdi dir="ltr">{selectedProduct.paymentNumber}</bdi></p>}
+                    {selectedProduct.whatsappNumber && <p>WhatsApp <a href={`https://wa.me/${String(selectedProduct.whatsappNumber).replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer"><bdi dir="ltr">{selectedProduct.whatsappNumber}</bdi></a></p>}
+                  </section>
+                )}
 
                 {checkoutMessage && (
                   <div className="gc-checkout-message" role="status">
