@@ -266,6 +266,7 @@ function GameCards() {
   const [walletBalanceError, setWalletBalanceError] = useState("");
   const [popularCarouselPaused, setPopularCarouselPaused] = useState(false);
   const [popularCarouselElement, setPopularCarouselElement] = useState(null);
+  const checkoutRightRef = useRef(null);
   const popularDirectionRef = useRef(1);
   const popularResumeTimerRef = useRef(null);
   const popularInteractionRef = useRef({ pointer: false, focus: false });
@@ -685,6 +686,12 @@ function GameCards() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [selectedProduct]);
+
+  useEffect(() => {
+    if (selectedProduct && checkoutRightRef.current) {
+      checkoutRightRef.current.scrollTop = 0;
+    }
+  }, [selectedProduct?.id]);
 
   const subtotal = selectedPack
     ? Number(selectedPack.price) * quantity
@@ -1661,7 +1668,7 @@ function GameCards() {
                 </div>
               </div>
 
-              <div className="gc-checkout-right">
+              <div className="gc-checkout-right" ref={checkoutRightRef}>
                 {selectedProductVariants.length > 1 && <section className="gc-checkout-platform-picker" aria-label="Choose a platform">
                   <div className="gc-checkout-label">CHOOSE YOUR PLATFORM</div>
                   <div className="gc-checkout-platform-options">
