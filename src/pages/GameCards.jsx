@@ -21,6 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmailSuggestion from "../components/EmailSuggestion";
+import { recordGameActivity } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
 import { useEmailTypoGuard } from "../hooks/useEmailTypoGuard";
 import { isValidEmail } from "../utils/email";
@@ -336,6 +337,10 @@ function GameCards() {
   useEffect(() => {
     loadCatalog();
     loadPaymentMethods();
+  }, []);
+
+  useEffect(() => {
+    void recordGameActivity("shopping", "shopping-view").catch(() => {});
   }, []);
 
   const categories = useMemo(() => {

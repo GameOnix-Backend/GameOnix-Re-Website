@@ -60,6 +60,7 @@ function formatDigitalCodePrice(value) {
 
 function HomeDigitalCodeHero() {
   const [products, setProducts] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -78,7 +79,16 @@ function HomeDigitalCodeHero() {
     return () => { active = false; };
   }, []);
 
-  const product = products.find((item) => item.featuredOnHome) || products[0];
+  const selectedFeaturedProducts = products.filter((item) => item.featuredOnHome);
+  const slides = selectedFeaturedProducts.length ? selectedFeaturedProducts : products.slice(0, 1);
+  useEffect(() => setActiveIndex(0), [slides.length]);
+  useEffect(() => {
+    if (slides.length < 2) return undefined;
+    const timer = window.setInterval(() => setActiveIndex((index) => (index + 1) % slides.length), 7000);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
+  const product = slides[activeIndex] || slides[0];
   if (!product) {
     return (
       <section className="home-welcome">
@@ -92,19 +102,29 @@ function HomeDigitalCodeHero() {
     );
   }
 
-  const packages = (product.packs || []).filter((pack) => pack?.able !== false);
+  const packages = (product.packs || []).filter((pack, index) =>
+    pack?.able !== false && (!Array.isArray(product.homeHeroPackages) || product.homeHeroPackages.includes(index))
+  );
   const prices = packages.map((pack) => Number(pack?.price)).filter((price) => Number.isFinite(price) && price >= 0);
   const startingPrice = prices.length ? Math.min(...prices) : null;
+  const heroImage = getDigitalCodeImageUrl(product.homeHeroImage);
+  const heroBackground = heroImage
+    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .96) 0%, rgba(15, 16, 23, .82) 48%, rgba(15, 16, 23, .34) 100%), url("${heroImage}")` }
+    : undefined;
+  const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
+  const heroTags = Array.isArray(product.homeHeroTags) ? product.homeHeroTags.filter(Boolean) : [];
 
   return (
-    <section className="home-digital-hero" aria-label={`Featured digital code: ${product.name}`}>
+    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
       <div className="home-digital-hero-copy">
-        <span className="home-digital-hero-kicker">FEATURED DIGITAL CODE</span>
-        <h1>{product.name}</h1>
+        <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || "FEATURED DIGITAL CODE"}</span>
+        <h1>{heroTitle}</h1>
         <div className="home-digital-hero-meta">
           {product.publisher && <span>{product.publisher}</span>}
           <span>{getDigitalCodePlatform(product)}</span>
         </div>
+        {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}
+        {product.homeHeroDescription && <p className="home-digital-hero-description">{product.homeHeroDescription}</p>}
         {startingPrice !== null && <p className="home-digital-starting-price">Starting from {formatDigitalCodePrice(startingPrice)}</p>}
         <div className="home-digital-packages" aria-label="Available editions and prices">
           {packages.length ? packages.map((pack, index) => (
@@ -118,8 +138,13 @@ function HomeDigitalCodeHero() {
         <Link className="home-digital-hero-cta" to="/shopping/game-cards">
           View digital code <FontAwesomeIcon icon={faChevronRight} />
         </Link>
+        {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">
+          <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured digital code"><FontAwesomeIcon icon={faChevronLeft} /></button>
+          {slides.map((item, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={item.id} onClick={() => setActiveIndex(index)} aria-label={`Show ${item.name}`} aria-pressed={index === activeIndex} />)}
+          <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured digital code"><FontAwesomeIcon icon={faChevronRight} /></button>
+        </div>}
       </div>
-      {product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={product.name} /></div>}
+      {!heroImage && product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
       <div className="home-digital-hero-glow" aria-hidden="true" />
     </section>
   );
