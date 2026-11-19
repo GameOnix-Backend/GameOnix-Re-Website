@@ -106,6 +106,7 @@
 .home-digital-hero-platforms { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .home-digital-hero-platforms button { display: inline-flex; align-items: center; gap: 7px; border: 1px solid rgba(207, 190, 255, .3); border-radius: 999px; padding: 7px 11px; color: #c7bfd4; background: rgba(16, 14, 22, .6); font-size: 9px; font-weight: 850; cursor: pointer; transition: color .16s, border-color .16s, background .16s, transform .16s; }
 .home-digital-hero-platforms button svg { font-size: 13px; }
+.home-digital-hero-platforms button i { color: #9f8ebc; font-size: 10px; font-style: normal; }
 .home-digital-hero-platforms button:hover { transform: translateY(-1px); border-color: rgba(207, 183, 255, .7); color: #fff; }
 .home-digital-hero-platforms button.active { border-color: rgba(198, 164, 255, .72); color: #fff; background: linear-gradient(130deg, rgba(105, 72, 157, .7), rgba(34, 27, 46, .8)); box-shadow: 0 4px 15px rgba(26, 16, 43, .2); }
 .home-digital-hero-platforms button:focus-visible { outline: 2px solid #d9c7ff; outline-offset: 2px; }

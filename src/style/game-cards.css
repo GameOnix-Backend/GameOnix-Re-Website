@@ -3063,6 +3063,7 @@
 
 .gc-digital-code-card .gc-product-image { height: auto; aspect-ratio: 2 / 3; }
 .gc-digital-code-card .gc-product-image > .gc-image-wrap { padding: 0; }
+.gc-digital-code-card .gc-product-image > .gc-image-wrap img { object-fit: cover; transform: scale(1.08); }
 .gc-digital-code-card .gc-product-info { display: none; }
 .gc-digital-code-overlay {
     position: absolute;
@@ -3165,6 +3166,10 @@
 }
 .gc-digital-platform-badge svg { margin-right: 4px; font-size: 10px; vertical-align: -1px; }
 .gc-digital-platform-badge .gc-nintendo-platform-mark { width: 11px; height: 11px; margin-right: 4px; font-size: 7px; }
+.gc-digital-platform-icons { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 7px; border: 1px solid rgba(222, 207, 255, .36); border-radius: 999px; padding: 5px 9px; color: #f4edff; background: rgba(20, 15, 31, .88); }
+.gc-digital-platform-icon-item { display: inline-flex; align-items: center; gap: 7px; line-height: 1; }
+.gc-digital-platform-icon-item > svg { font-size: 12px; }
+.gc-digital-platform-icon-item > i { color: #9988b7; font-size: 10px; font-style: normal; }
 
 .gc-checkout-right .gc-checkout-platform-picker { margin: 0 0 16px; padding: 0 0 15px; border: 0; border-bottom: 1px solid #2b2b30; background: none; }
 .gc-checkout-right .gc-checkout-platform-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

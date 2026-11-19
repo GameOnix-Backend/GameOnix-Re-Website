@@ -136,7 +136,7 @@ function HomeDigitalCodeHero() {
         {heroVariants.length > 1 && <div className="home-digital-hero-platforms" role="group" aria-label="Choose a game platform">
           {heroVariants.map((variant) => <button type="button" key={variant.id} className={String(variant.id) === String(product.id) ? "active" : ""} aria-pressed={String(variant.id) === String(product.id)} onClick={() => setActiveVariantId(String(variant.id))} title={getDigitalCodePlatform(variant)}>
             <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
-            <span>{getDigitalCodePlatform(variant)}</span>
+            <i aria-hidden="true">|</i><span>{getDigitalCodePlatform(variant)}</span>
           </button>)}
         </div>}
         {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}

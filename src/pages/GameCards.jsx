@@ -112,6 +112,16 @@ function DigitalPlatformIcon({ product }) {
   return <FontAwesomeIcon icon={faGamepad} />;
 }
 
+function DigitalPlatformIconList({ product, variants }) {
+  const platforms = variants?.length ? variants : [product];
+  return <span className="gc-digital-platform-icons" role="img" aria-label={platforms.map(getDigitalPlatformLabel).join(" and ")}>
+    {platforms.map((variant, index) => <span className="gc-digital-platform-icon-item" key={variant.id || `${variant.platform}-${index}`}>
+      {index > 0 && <i aria-hidden="true">|</i>}
+      <DigitalPlatformIcon product={variant} />
+    </span>)}
+  </span>;
+}
+
 function isPackInStock(pack) {
   return pack?.stock !== false;
 }
@@ -1169,7 +1179,7 @@ function GameCards() {
                                   <div className="gc-digital-code-overlay">
                                     <div className="gc-digital-code-overlay-meta">
                                       <strong>{product.publisher || "Digital game"}</strong>
-                                      <span className="gc-digital-platform-badge"><DigitalPlatformIcon product={product} />{getDigitalPlatformLabel(product)}</span>
+                                      <DigitalPlatformIconList product={product} variants={product.digitalCodeVariants} />
                                     </div>
                                     <span>{getStartingPrice(product) === null ? "Price unavailable" : formatPrice(getStartingPrice(product))}</span>
                                     <small>{product.name}</small>
@@ -1285,7 +1295,7 @@ function GameCards() {
                                   <div className="gc-digital-code-overlay">
                                     <div className="gc-digital-code-overlay-meta">
                                       <strong>{product.publisher || "Digital game"}</strong>
-                                      <span className="gc-digital-platform-badge"><DigitalPlatformIcon product={product} />{getDigitalPlatformLabel(product)}</span>
+                                      <DigitalPlatformIconList product={product} variants={product.digitalCodeVariants} />
                                     </div>
                                     <span>{startingPrice === null ? "Price unavailable" : formatPrice(startingPrice)}</span>
                                     <small>{product.name}</small>
