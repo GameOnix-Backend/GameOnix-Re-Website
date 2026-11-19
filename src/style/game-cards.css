@@ -3086,6 +3086,19 @@
     .gc-digital-code-overlay { opacity: 1; }
 }
 
+.gc-popular-card.gc-digital-code-card {
+    flex: 0 0 clamp(150px, 17vw, 205px);
+    border-radius: 14px;
+}
+.gc-popular-card.gc-digital-code-card .gc-product-image {
+    height: auto;
+    aspect-ratio: 2 / 3;
+}
+.gc-popular-card.gc-digital-code-card .gc-digital-code-overlay { padding: 14px; }
+.gc-popular-card.gc-digital-code-card .gc-digital-code-overlay span { font-size: 18px; }
+.gc-popular-card.gc-digital-code-card .gc-popular-badge { top: 9px; right: 9px; }
+.gc-popular-card.gc-digital-code-card .gc-product-open { z-index: 2; }
+
 
 .gc-product-title {
     display: flex;
