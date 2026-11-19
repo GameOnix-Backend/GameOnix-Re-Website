@@ -3061,6 +3061,31 @@
 .gc-code-contact-card p { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: #9ca7bc; font-size: 11px; }
 .gc-code-contact-card bdi, .gc-code-contact-card a { color: #d1c6ff; font-weight: 650; text-decoration: none; }
 
+.gc-digital-code-card .gc-product-image { height: 250px; }
+.gc-digital-code-card .gc-product-info { display: none; }
+.gc-digital-code-overlay {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 7px;
+    padding: 18px;
+    background: linear-gradient(180deg, transparent 28%, rgba(10, 10, 14, .88) 100%);
+    opacity: 0;
+    transition: opacity .22s ease;
+}
+.gc-digital-code-overlay strong { color: #d4b6ff; font-size: 11px; font-weight: 750; }
+.gc-digital-code-overlay span { color: #fff; font-size: 20px; font-weight: 900; }
+.gc-digital-code-overlay small { color: #d2d0d8; font-size: 11px; }
+.gc-digital-code-card:hover .gc-digital-code-overlay,
+.gc-digital-code-card .gc-product-click:focus-visible .gc-digital-code-overlay { opacity: 1; }
+
+@media (hover: none) {
+    .gc-digital-code-overlay { opacity: 1; }
+}
+
 
 .gc-product-title {
     display: flex;

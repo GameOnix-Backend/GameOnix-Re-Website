@@ -80,6 +80,15 @@ function formatPrice(value) {
   })}`;
 }
 
+function getStartingPrice(product) {
+  const prices = (product?.packs || [])
+    .filter((pack) => pack?.able !== false)
+    .map((pack) => Number(pack?.price))
+    .filter((price) => Number.isFinite(price) && price >= 0);
+
+  return prices.length ? Math.min(...prices) : null;
+}
+
 function isPackInStock(pack) {
   return pack?.stock !== false;
 }
@@ -406,7 +415,10 @@ function GameCards() {
     [filteredCatalog]
   );
   const gameProducts = filteredCatalog.filter(
-    (product) => ["game", "digital-code"].includes(getProductKind(product))
+    (product) => getProductKind(product) === "game"
+  );
+  const digitalCodeProducts = filteredCatalog.filter(
+    (product) => getProductKind(product) === "digital-code"
   );
   const giftCardProducts = filteredCatalog.filter(
     (product) => getProductKind(product) === "gift-card"
@@ -1068,7 +1080,7 @@ function GameCards() {
 
                         return (
                           <article
-                            className={`gc-product-card gc-popular-card${isOutOfStock ? " out-of-stock" : ""}`}
+                            className={`gc-product-card gc-popular-card${getProductKind(product) === "digital-code" ? " gc-digital-code-card" : ""}${isOutOfStock ? " out-of-stock" : ""}`}
                             key={product.id}
                             onPointerEnter={() => {
                               popularInteractionRef.current.pointer = true;
@@ -1095,6 +1107,13 @@ function GameCards() {
                                   src={getImageUrl(product.image)}
                                   alt={product.name}
                                 />
+                                {getProductKind(product) === "digital-code" && (
+                                  <div className="gc-digital-code-overlay">
+                                    <strong>{product.publisher || "Digital game"}</strong>
+                                    <span>{getStartingPrice(product) === null ? "Price unavailable" : formatPrice(getStartingPrice(product))}</span>
+                                    <small>{product.name}</small>
+                                  </div>
+                                )}
                                 <span className="gc-popular-badge">
                                   <FontAwesomeIcon icon={faFire} /> Popular
                                 </span>
@@ -1138,6 +1157,11 @@ function GameCards() {
                   title: "Gift Cards",
                   products: giftCardProducts,
                 },
+                {
+                  id: "gc-digital-codes",
+                  title: "Digital Codes",
+                  products: digitalCodeProducts,
+                },
               ]
                 .filter((section) => section.products.length > 0)
                 .map((section) => (
@@ -1166,13 +1190,15 @@ function GameCards() {
                         const isOutOfStock =
                           packs.length > 0 && inStockPacks.length === 0;
                         const popular = packs.some((pack) => pack.popular);
+                        const isDigitalCode = getProductKind(product) === "digital-code";
+                        const startingPrice = getStartingPrice(product);
                         const productType = String(product.type || "").trim();
                         const isGiftCards =
                           productType.toLowerCase() === "gift cards";
 
                         return (
                           <article
-                            className={`gc-product-card${isOutOfStock ? " out-of-stock" : ""}`}
+                            className={`gc-product-card${isDigitalCode ? " gc-digital-code-card" : ""}${isOutOfStock ? " out-of-stock" : ""}`}
                             key={product.id}
                             id={`gc-product-${product.id}`}
                           >
@@ -1192,6 +1218,14 @@ function GameCards() {
                                   src={getImageUrl(product.image)}
                                   alt={product.name}
                                 />
+
+                                {isDigitalCode && (
+                                  <div className="gc-digital-code-overlay">
+                                    <strong>{product.publisher || "Digital game"}</strong>
+                                    <span>{startingPrice === null ? "Price unavailable" : formatPrice(startingPrice)}</span>
+                                    <small>{product.name}</small>
+                                  </div>
+                                )}
 
                                 {productType && (
                                   <span
