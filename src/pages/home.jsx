@@ -109,7 +109,7 @@ function HomeDigitalCodeHero() {
   const startingPrice = prices.length ? Math.min(...prices) : null;
   const heroImage = getDigitalCodeImageUrl(product.homeHeroImage);
   const heroBackground = heroImage
-    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .64) 0%, rgba(15, 16, 23, .49) 14%, rgba(15, 16, 23, .28) 30%, rgba(15, 16, 23, .11) 47%, rgba(15, 16, 23, 0) 65%), linear-gradient(0deg, rgba(15, 16, 23, .16), rgba(15, 16, 23, 0) 54%), url("${heroImage}")` }
+    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .66) 0%, rgba(15, 16, 23, .5) 22%, rgba(15, 16, 23, .24) 45%, rgba(15, 16, 23, .04) 68%), linear-gradient(0deg, rgba(15, 16, 23, .14), rgba(15, 16, 23, 0) 54%), url("${heroImage}")` }
     : undefined;
   const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
   const heroTags = Array.isArray(product.homeHeroTags) ? product.homeHeroTags.filter(Boolean) : [];
@@ -136,7 +136,7 @@ function HomeDigitalCodeHero() {
           )) : <p>No packages available yet.</p>}
         </div>
         <Link className="home-digital-hero-cta" to={`/shopping/game-cards?digitalCode=${encodeURIComponent(product.id)}#gc-digital-codes`}>
-          View digital code <FontAwesomeIcon icon={faChevronRight} />
+          <span>Explore this game</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
         </Link>
         {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">
           <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured digital code"><FontAwesomeIcon icon={faChevronLeft} /></button>
