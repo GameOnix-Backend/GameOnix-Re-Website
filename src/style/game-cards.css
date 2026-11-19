@@ -3084,6 +3084,11 @@
 .gc-digital-code-overlay-meta strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gc-digital-code-card:hover .gc-digital-code-overlay,
 .gc-digital-code-card .gc-product-click:focus-visible .gc-digital-code-overlay { opacity: 1; }
+.gc-digital-variant-picker { display: flex; gap: 7px; padding: 9px; border-top: 1px solid rgba(255, 255, 255, .07); background: rgba(15, 14, 19, .92); }
+.gc-digital-variant-picker button { flex: 1 1 0; min-width: 0; border: 1px solid rgba(190, 168, 235, .24); border-radius: 8px; padding: 7px 8px; color: #aaa3b9; background: rgba(255, 255, 255, .035); font-size: 10px; font-weight: 800; cursor: pointer; transition: color .16s, border-color .16s, background .16s, transform .16s; }
+.gc-digital-variant-picker button:hover { transform: translateY(-1px); border-color: rgba(199, 173, 255, .62); color: #f4efff; }
+.gc-digital-variant-picker button.active { border-color: rgba(184, 145, 255, .72); color: #fff; background: linear-gradient(135deg, rgba(116, 78, 183, .62), rgba(80, 52, 133, .48)); box-shadow: inset 0 1px rgba(255, 255, 255, .1); }
+.gc-digital-variant-picker button:focus-visible { outline: 2px solid #c5a9ff; outline-offset: 2px; }
 
 @media (hover: none) {
     .gc-digital-code-overlay { opacity: 1; }

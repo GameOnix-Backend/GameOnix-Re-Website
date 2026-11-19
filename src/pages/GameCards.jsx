@@ -225,6 +225,7 @@ function GameCards() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedDigitalVariants, setSelectedDigitalVariants] = useState({});
   const [selectedPack, setSelectedPack] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState("");
@@ -449,6 +450,21 @@ function GameCards() {
   const digitalCodeProducts = filteredCatalog.filter(
     (product) => getProductKind(product) === "digital-code"
   );
+  const groupedDigitalCodeProducts = useMemo(() => {
+    const groups = new Map();
+    for (const product of digitalCodeProducts) {
+      const explicitGroup = String(product.digitalCodeGroup || "").trim().toLowerCase();
+      const key = explicitGroup || String(product.id);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(product);
+    }
+    return [...groups].map(([key, variants]) => ({ key, variants }));
+  }, [digitalCodeProducts]);
+  const digitalCodeCards = useMemo(() => groupedDigitalCodeProducts.map(({ key, variants }) => {
+    const selectedId = selectedDigitalVariants[key];
+    const product = variants.find((variant) => String(variant.id) === String(selectedId)) || variants[0];
+    return { ...product, digitalCodeVariants: variants, digitalCodeGroupKey: key };
+  }), [groupedDigitalCodeProducts, selectedDigitalVariants]);
   const giftCardProducts = filteredCatalog.filter(
     (product) => getProductKind(product) === "gift-card"
   );
@@ -1187,7 +1203,7 @@ function GameCards() {
                 {
                   id: "gc-digital-codes",
                   title: "Digital Codes",
-                  products: digitalCodeProducts,
+                  products: digitalCodeCards,
                 },
               ]
                 .filter((section) => section.products.length > 0)
@@ -1223,10 +1239,11 @@ function GameCards() {
                         const isGiftCards =
                           productType.toLowerCase() === "gift cards";
 
+                        const variants = product.digitalCodeVariants || [product];
                         return (
                           <article
                             className={`gc-product-card${isDigitalCode ? " gc-digital-code-card" : ""}${isOutOfStock ? " out-of-stock" : ""}`}
-                            key={product.id}
+                            key={product.digitalCodeGroupKey || product.id}
                             id={`gc-product-${product.id}`}
                           >
                             <button
@@ -1298,6 +1315,15 @@ function GameCards() {
                                 </div>
                               </div>
                             </button>
+                            {isDigitalCode && variants.length > 1 && <div className="gc-digital-variant-picker" role="group" aria-label={`Choose a platform for ${product.name}`}>
+                              {variants.map((variant) => <button
+                                type="button"
+                                key={variant.id}
+                                className={String(variant.id) === String(product.id) ? "active" : ""}
+                                aria-pressed={String(variant.id) === String(product.id)}
+                                onClick={() => setSelectedDigitalVariants((current) => ({ ...current, [product.digitalCodeGroupKey]: String(variant.id) }))}
+                              >{getDigitalPlatformLabel(variant)}</button>)}
+                            </div>}
                           </article>
                         );
                       })}
