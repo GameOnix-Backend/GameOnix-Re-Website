@@ -48,9 +48,9 @@ const navigation = [
     section: "SHOPPING",
     items: [
       {
-        label: "Game Cards",
+        label: "Shopping",
         to: "/shopping/game-cards",
-        icon: faCreditCard,
+        icon: faBagShopping,
         // badge: "Coming soon",
       },
       { label: "My Orders", to: "/orders", icon: faReceipt },
