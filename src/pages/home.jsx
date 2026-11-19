@@ -61,7 +61,6 @@ function formatDigitalCodePrice(value) {
 function HomeDigitalCodeHero() {
   const [products, setProducts] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [activeVariantId, setActiveVariantId] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -95,8 +94,7 @@ function HomeDigitalCodeHero() {
   }, [slides.length]);
 
   const heroVariants = slides[activeIndex] || slides[0] || [];
-  const product = heroVariants.find((item) => String(item.id) === String(activeVariantId))
-    || heroVariants.find((item) => item.featuredOnHome)
+  const product = heroVariants.find((item) => item.featuredOnHome)
     || heroVariants[0];
   if (!product) {
     return (
@@ -131,14 +129,11 @@ function HomeDigitalCodeHero() {
         <h1>{heroTitle}</h1>
         <div className="home-digital-hero-meta">
           {product.publisher && <span>{product.publisher}</span>}
-          <span>{getDigitalCodePlatform(product)}</span>
-        </div>
-        {heroVariants.length > 1 && <div className="home-digital-hero-platforms" role="group" aria-label="Choose a game platform">
-          {heroVariants.map((variant) => <button type="button" key={variant.id} className={String(variant.id) === String(product.id) ? "active" : ""} aria-pressed={String(variant.id) === String(product.id)} onClick={() => setActiveVariantId(String(variant.id))} title={getDigitalCodePlatform(variant)}>
+          {heroVariants.map((variant) => <span className="home-digital-platform-tag" key={variant.id} title={getDigitalCodePlatform(variant)}>
             <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
             <i aria-hidden="true">|</i><span>{getDigitalCodePlatform(variant)}</span>
-          </button>)}
-        </div>}
+          </span>)}
+        </div>
         {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}
         {product.homeHeroDescription && <p className="home-digital-hero-description">{product.homeHeroDescription}</p>}
         {startingPrice !== null && <p className="home-digital-starting-price">Starting from {formatDigitalCodePrice(startingPrice)}</p>}
