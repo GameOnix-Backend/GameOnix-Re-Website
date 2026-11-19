@@ -1111,12 +1111,14 @@ function GameCards() {
                                 />
                                 {getProductKind(product) === "digital-code" && (
                                   <div className="gc-digital-code-overlay">
-                                    <strong>{product.publisher || "Digital game"}</strong>
+                                    <div className="gc-digital-code-overlay-meta">
+                                      <strong>{product.publisher || "Digital game"}</strong>
+                                      <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>
+                                    </div>
                                     <span>{getStartingPrice(product) === null ? "Price unavailable" : formatPrice(getStartingPrice(product))}</span>
                                     <small>{product.name}</small>
                                   </div>
                                 )}
-                                {getProductKind(product) === "digital-code" && <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>}
                                 <span className="gc-popular-badge">
                                   <FontAwesomeIcon icon={faFire} /> Popular
                                 </span>
@@ -1224,12 +1226,14 @@ function GameCards() {
 
                                 {isDigitalCode && (
                                   <div className="gc-digital-code-overlay">
-                                    <strong>{product.publisher || "Digital game"}</strong>
+                                    <div className="gc-digital-code-overlay-meta">
+                                      <strong>{product.publisher || "Digital game"}</strong>
+                                      <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>
+                                    </div>
                                     <span>{startingPrice === null ? "Price unavailable" : formatPrice(startingPrice)}</span>
                                     <small>{product.name}</small>
                                   </div>
                                 )}
-                                {isDigitalCode && <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>}
 
                                 {productType && (
                                   <span

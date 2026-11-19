@@ -3080,6 +3080,8 @@
 .gc-digital-code-overlay strong { color: #d4b6ff; font-size: 11px; font-weight: 750; }
 .gc-digital-code-overlay span { color: #fff; font-size: 20px; font-weight: 900; }
 .gc-digital-code-overlay small { color: #d2d0d8; font-size: 11px; }
+.gc-digital-code-overlay-meta { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gc-digital-code-overlay-meta strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gc-digital-code-card:hover .gc-digital-code-overlay,
 .gc-digital-code-card .gc-product-click:focus-visible .gc-digital-code-overlay { opacity: 1; }
 
@@ -3124,21 +3126,18 @@
 }
 .gc-popular-card.gc-digital-code-card .gc-digital-code-overlay { padding: 14px; }
 .gc-popular-card.gc-digital-code-card .gc-digital-code-overlay span { font-size: 18px; }
+.gc-popular-card.gc-digital-code-card .gc-digital-code-overlay-meta .gc-digital-platform-badge { padding: 5px 8px; font-size: 8px; }
 .gc-popular-card.gc-digital-code-card .gc-popular-badge { top: 9px; right: 9px; }
 .gc-popular-card.gc-digital-code-card .gc-product-open { z-index: 2; }
 .gc-digital-platform-badge {
-    position: absolute;
-    z-index: 4;
-    right: 50%;
-    bottom: 12px;
-    transform: translateX(50%);
+    position: static;
+    flex: 0 0 auto;
     border: 1px solid rgba(222, 207, 255, .36);
     border-radius: 999px;
-    padding: 6px 12px;
+    padding: 5px 8px;
     color: #f4edff;
     background: rgba(20, 15, 31, .88);
-    box-shadow: 0 5px 16px rgba(0, 0, 0, .42);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 900;
     letter-spacing: .8px;
     line-height: 1;
