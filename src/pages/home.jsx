@@ -61,6 +61,7 @@ function formatDigitalCodePrice(value) {
 function HomeDigitalCodeHero() {
   const [products, setProducts] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeVariantId, setActiveVariantId] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -79,8 +80,13 @@ function HomeDigitalCodeHero() {
     return () => { active = false; };
   }, []);
 
+  const groupKey = (item) => String(item?.digitalCodeGroup || item?.id || "").trim().toLowerCase();
   const selectedFeaturedProducts = products.filter((item) => item.featuredOnHome);
-  const slides = selectedFeaturedProducts.length ? selectedFeaturedProducts : products.slice(0, 1);
+  const featuredGroupKeys = new Set(selectedFeaturedProducts.map(groupKey));
+  const slideSeeds = selectedFeaturedProducts.length
+    ? products.filter((item, index) => featuredGroupKeys.has(groupKey(item)) && products.findIndex((candidate) => groupKey(candidate) === groupKey(item)) === index)
+    : products.slice(0, 1);
+  const slides = slideSeeds.map((seed) => products.filter((item) => groupKey(item) === groupKey(seed)));
   useEffect(() => setActiveIndex(0), [slides.length]);
   useEffect(() => {
     if (slides.length < 2) return undefined;
@@ -88,7 +94,10 @@ function HomeDigitalCodeHero() {
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  const product = slides[activeIndex] || slides[0];
+  const heroVariants = slides[activeIndex] || slides[0] || [];
+  const product = heroVariants.find((item) => String(item.id) === String(activeVariantId))
+    || heroVariants.find((item) => item.featuredOnHome)
+    || heroVariants[0];
   if (!product) {
     return (
       <section className="home-welcome">
@@ -107,12 +116,13 @@ function HomeDigitalCodeHero() {
   );
   const prices = packages.map((pack) => Number(pack?.price)).filter((price) => Number.isFinite(price) && price >= 0);
   const startingPrice = prices.length ? Math.min(...prices) : null;
-  const heroImage = getDigitalCodeImageUrl(product.homeHeroImage);
+  const heroImageProduct = heroVariants.find((item) => item.homeHeroImage);
+  const heroImage = getDigitalCodeImageUrl(product.homeHeroImage || heroImageProduct?.homeHeroImage);
   const heroBackground = heroImage
     ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .66) 0%, rgba(15, 16, 23, .5) 22%, rgba(15, 16, 23, .24) 45%, rgba(15, 16, 23, .04) 68%), linear-gradient(0deg, rgba(15, 16, 23, .14), rgba(15, 16, 23, 0) 54%), url("${heroImage}")` }
     : undefined;
   const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
-  const heroTags = Array.isArray(product.homeHeroTags) ? product.homeHeroTags.filter(Boolean) : [];
+  const heroTags = [...new Set(heroVariants.flatMap((item) => Array.isArray(item.homeHeroTags) ? item.homeHeroTags.filter(Boolean) : []))];
 
   return (
     <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
@@ -123,6 +133,12 @@ function HomeDigitalCodeHero() {
           {product.publisher && <span>{product.publisher}</span>}
           <span>{getDigitalCodePlatform(product)}</span>
         </div>
+        {heroVariants.length > 1 && <div className="home-digital-hero-platforms" role="group" aria-label="Choose a game platform">
+          {heroVariants.map((variant) => <button type="button" key={variant.id} className={String(variant.id) === String(product.id) ? "active" : ""} aria-pressed={String(variant.id) === String(product.id)} onClick={() => setActiveVariantId(String(variant.id))} title={getDigitalCodePlatform(variant)}>
+            <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
+            <span>{getDigitalCodePlatform(variant)}</span>
+          </button>)}
+        </div>}
         {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}
         {product.homeHeroDescription && <p className="home-digital-hero-description">{product.homeHeroDescription}</p>}
         {startingPrice !== null && <p className="home-digital-starting-price">Starting from {formatDigitalCodePrice(startingPrice)}</p>}
@@ -140,7 +156,7 @@ function HomeDigitalCodeHero() {
         </Link>
         {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">
           <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured digital code"><FontAwesomeIcon icon={faChevronLeft} /></button>
-          {slides.map((item, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={item.id} onClick={() => setActiveIndex(index)} aria-label={`Show ${item.name}`} aria-pressed={index === activeIndex} />)}
+          {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
           <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured digital code"><FontAwesomeIcon icon={faChevronRight} /></button>
         </div>}
       </div>

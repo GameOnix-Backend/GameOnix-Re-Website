@@ -108,7 +108,7 @@ function DigitalPlatformIcon({ product }) {
   if (platform === "playstation") return <FontAwesomeIcon icon={faPlaystation} />;
   if (platform === "xbox") return <FontAwesomeIcon icon={faXbox} />;
   if (platform === "pc") return <FontAwesomeIcon icon={faWindows} />;
-  if (platform === "nintendo-switch") return <span className="gc-nintendo-platform-mark" aria-hidden="true">N</span>;
+  if (platform === "nintendo-switch") return <FontAwesomeIcon icon={faGamepad} />;
   return <FontAwesomeIcon icon={faGamepad} />;
 }
 
@@ -1169,7 +1169,7 @@ function GameCards() {
                                   <div className="gc-digital-code-overlay">
                                     <div className="gc-digital-code-overlay-meta">
                                       <strong>{product.publisher || "Digital game"}</strong>
-                                      <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>
+                                      <span className="gc-digital-platform-badge"><DigitalPlatformIcon product={product} />{getDigitalPlatformLabel(product)}</span>
                                     </div>
                                     <span>{getStartingPrice(product) === null ? "Price unavailable" : formatPrice(getStartingPrice(product))}</span>
                                     <small>{product.name}</small>
@@ -1285,7 +1285,7 @@ function GameCards() {
                                   <div className="gc-digital-code-overlay">
                                     <div className="gc-digital-code-overlay-meta">
                                       <strong>{product.publisher || "Digital game"}</strong>
-                                      <span className="gc-digital-platform-badge">{getDigitalPlatformLabel(product)}</span>
+                                      <span className="gc-digital-platform-badge"><DigitalPlatformIcon product={product} />{getDigitalPlatformLabel(product)}</span>
                                     </div>
                                     <span>{startingPrice === null ? "Price unavailable" : formatPrice(startingPrice)}</span>
                                     <small>{product.name}</small>
@@ -1393,23 +1393,6 @@ function GameCards() {
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </header>
-
-            {selectedProductVariants.length > 1 && <section className="gc-checkout-platform-picker" aria-label="Choose a platform">
-              <div className="gc-checkout-label">CHOOSE YOUR PLATFORM</div>
-              <div className="gc-checkout-platform-options">
-                {selectedProductVariants.map((variant) => <button
-                  type="button"
-                  key={variant.id}
-                  className={String(variant.id) === String(selectedProduct.id) ? "active" : ""}
-                  aria-pressed={String(variant.id) === String(selectedProduct.id)}
-                  onClick={() => { setSelectedDigitalVariants((current) => ({ ...current, [String(variant.digitalCodeGroup).trim().toLowerCase()]: String(variant.id) })); void openProduct(variant); }}
-                >
-                  <DigitalPlatformIcon product={variant} />
-                  <span>{getDigitalPlatformLabel(variant)}</span>
-                  <small>{getStartingPrice(variant) === null ? "Price unavailable" : `From ${formatPrice(getStartingPrice(variant))}`}</small>
-                </button>)}
-              </div>
-            </section>}
 
             {authLoading ? (
               <div className="gc-auth-gate" role="status">
@@ -1681,6 +1664,22 @@ function GameCards() {
               </div>
 
               <div className="gc-checkout-right">
+                {selectedProductVariants.length > 1 && <section className="gc-checkout-platform-picker" aria-label="Choose a platform">
+                  <div className="gc-checkout-label">CHOOSE YOUR PLATFORM</div>
+                  <div className="gc-checkout-platform-options">
+                    {selectedProductVariants.map((variant) => <button
+                      type="button"
+                      key={variant.id}
+                      className={String(variant.id) === String(selectedProduct.id) ? "active" : ""}
+                      aria-pressed={String(variant.id) === String(selectedProduct.id)}
+                      onClick={() => { setSelectedDigitalVariants((current) => ({ ...current, [String(variant.digitalCodeGroup).trim().toLowerCase()]: String(variant.id) })); void openProduct(variant); }}
+                    >
+                      <DigitalPlatformIcon product={variant} />
+                      <span>{getDigitalPlatformLabel(variant)}</span>
+                      <small>{getStartingPrice(variant) === null ? "Price unavailable" : `From ${formatPrice(getStartingPrice(variant))}`}</small>
+                    </button>)}
+                  </div>
+                </section>}
                 <section className="gc-pack-selector">
                   <div className="gc-checkout-label">
                     SELECT YOUR PACK
