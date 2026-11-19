@@ -120,7 +120,7 @@
 .home-digital-hero-art { position: relative; z-index: 1; height: 340px; display: grid; place-items: center; }
 .home-digital-hero-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 32px rgba(0, 0, 0, .55)); }
 .home-digital-hero-glow { position: absolute; right: 6%; top: 50%; width: 320px; height: 320px; border-radius: 50%; background: rgba(130, 84, 226, .16); filter: blur(80px); pointer-events: none; }
-.home-digital-hero.has-custom-image { grid-template-columns: minmax(0, 1fr); background-color: #15141b; background-repeat: no-repeat; background-size: auto, auto, auto 100%; background-position: center, center, right center; }
+.home-digital-hero.has-custom-image { grid-template-columns: minmax(0, 1fr); background-color: #15141b; background-repeat: no-repeat; background-size: cover; background-position: center; }
 .home-digital-hero.has-custom-image .home-digital-hero-copy { max-width: 68%; }
 .home-digital-hero-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
 .home-digital-hero-tags span { border: 1px solid rgba(209, 190, 255, .28); border-radius: 999px; padding: 5px 9px; color: #dfd1ff; background: rgba(29, 24, 43, .72); font-size: 9px; font-weight: 750; }
