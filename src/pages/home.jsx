@@ -131,7 +131,7 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
 
   const packages = (product.packs || []).filter((pack, index) =>
     pack?.able !== false && (!Array.isArray(product.homeHeroPackages) || product.homeHeroPackages.includes(index))
-  ).slice(0, 4);
+  );
   const prices = packages.map((pack) => Number(pack?.price)).filter((price) => Number.isFinite(price) && price >= 0);
   const startingPrice = prices.length ? Math.min(...prices) : null;
   const heroImageProduct = heroVariants.find((item) => item.homeHeroImage);
