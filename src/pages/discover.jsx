@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
 import { useGameCatalog } from "../hooks/useGameCatalog";
+import { HomeDigitalCodeHero } from "./home";
 
 import "./../style/discover-style.css";
 import { getGameCategories, gameHasCategory } from "../utils/game-categories";
@@ -133,6 +134,7 @@ function Discover() {
 
   return (
     <main className="discover-page">
+      <HomeDigitalCodeHero showFallback={false} />
       <section className="discover-hero">
         <div className="discover-hero-content">
           <span className="discover-eyebrow">

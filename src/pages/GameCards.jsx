@@ -21,6 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlaystation, faWindows, faXbox } from "@fortawesome/free-brands-svg-icons";
+import { HomeDigitalCodeHero } from "./home";
 import EmailSuggestion from "../components/EmailSuggestion";
 import { recordGameActivity } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
@@ -849,6 +850,8 @@ function GameCards() {
             Digital Store
           </div>
         </header>
+
+        <HomeDigitalCodeHero showFallback={false} />
 
         <section className="gc-hero">
           <div className="gc-hero-content">

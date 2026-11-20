@@ -58,7 +58,7 @@ function formatDigitalCodePrice(value) {
   }).format(amount);
 }
 
-function HomeDigitalCodeHero() {
+export function HomeDigitalCodeHero({ showFallback = true } = {}) {
   const [products, setProducts] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -97,6 +97,7 @@ function HomeDigitalCodeHero() {
   const product = heroVariants.find((item) => item.featuredOnHome)
     || heroVariants[0];
   if (!product) {
+    if (!showFallback) return null;
     return (
       <section className="home-welcome">
         <div className="home-welcome-copy">
