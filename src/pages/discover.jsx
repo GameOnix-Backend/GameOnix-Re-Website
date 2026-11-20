@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
@@ -6,6 +6,7 @@ import {
   faRotate,
   faSliders,
   faXmark,
+  faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import GameCard from "../components/GameCard";
 import { useGameCatalog } from "../hooks/useGameCatalog";
@@ -47,6 +48,21 @@ function Discover() {
   const [selectedPlatform, setSelectedPlatform] = useState("all");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("default");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef(null);
+
+  useEffect(() => {
+    function closeSort(event) {
+      if (event.key === "Escape") setSortOpen(false);
+      if (event.type === "mousedown" && !sortRef.current?.contains(event.target)) setSortOpen(false);
+    }
+    document.addEventListener("mousedown", closeSort);
+    document.addEventListener("keydown", closeSort);
+    return () => {
+      document.removeEventListener("mousedown", closeSort);
+      document.removeEventListener("keydown", closeSort);
+    };
+  }, []);
 
   const platforms = useMemo(() => {
     const found = new Map();
@@ -170,20 +186,18 @@ function Discover() {
             )}
           </label>
 
-          <label className="discover-sort">
+          <div className={`discover-sort${sortOpen ? " is-open" : ""}`} ref={sortRef}>
             <FontAwesomeIcon icon={faSliders} />
-
-            <select
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-              aria-label="Sort games"
-            >
-              <option value="default">Default order</option>
-              <option value="recent">Recently added</option>
-              <option value="name-asc">Name: A to Z</option>
-              <option value="name-desc">Name: Z to A</option>
-            </select>
-          </label>
+            <button type="button" className="discover-sort-trigger" aria-label="Sort games" aria-haspopup="listbox" aria-expanded={sortOpen} onClick={() => setSortOpen((open) => !open)}>
+              <span>{({ default: "Default order", recent: "Recently added", "name-asc": "Name: A to Z", "name-desc": "Name: Z to A" })[sortBy]}</span>
+              <FontAwesomeIcon icon={faChevronDown} />
+            </button>
+            {sortOpen && <div className="discover-sort-menu" role="listbox" aria-label="Sort games">
+              {[["default", "Default order"], ["recent", "Recently added"], ["name-asc", "Name: A to Z"], ["name-desc", "Name: Z to A"]].map(([value, label]) => (
+                <button type="button" role="option" aria-selected={sortBy === value} className={sortBy === value ? "selected" : ""} key={value} onClick={() => { setSortBy(value); setSortOpen(false); }}>{label}</button>
+              ))}
+            </div>}
+          </div>
         </div>
 
         <div className="discover-filters">
