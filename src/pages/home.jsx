@@ -58,7 +58,7 @@ function formatDigitalCodePrice(value) {
   }).format(amount);
 }
 
-export function HomeDigitalCodeHero({ showFallback = true } = {}) {
+export function HomeFeaturedHero({ showFallback = true } = {}) {
   const [products, setProducts] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -71,7 +71,7 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
       })
       .then((catalog) => {
         if (active && Array.isArray(catalog)) {
-          setProducts(catalog.filter((item) => item?.kind === "digital-code" && item?.able !== false));
+          setProducts(catalog.filter((item) => item && item.able !== false));
         }
       })
       .catch(() => {});
@@ -79,13 +79,20 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
     return () => { active = false; };
   }, []);
 
-  const groupKey = (item) => String(item?.digitalCodeGroup || item?.id || "").trim().toLowerCase();
+  const isDigitalCode = (item) => String(item?.kind || "").trim().toLowerCase() === "digital-code";
+  const groupKey = (item) => isDigitalCode(item)
+    ? String(item?.digitalCodeGroup || item?.id || "").trim().toLowerCase()
+    : String(item?.id || "").trim().toLowerCase();
   const selectedFeaturedProducts = products.filter((item) => item.featuredOnHome);
-  const featuredGroupKeys = new Set(selectedFeaturedProducts.map(groupKey));
-  const slideSeeds = selectedFeaturedProducts.length
-    ? products.filter((item, index) => featuredGroupKeys.has(groupKey(item)) && products.findIndex((candidate) => groupKey(candidate) === groupKey(item)) === index)
-    : products.slice(0, 1);
-  const slides = slideSeeds.map((seed) => products.filter((item) => groupKey(item) === groupKey(seed)));
+  const legacyDefault = products.some((item) => typeof item.featuredOnHome === "boolean")
+    ? []
+    : products.filter(isDigitalCode).slice(0, 1);
+  const slideSeeds = (selectedFeaturedProducts.length ? selectedFeaturedProducts : legacyDefault)
+    .filter((item, index, items) => items.findIndex((candidate) => groupKey(candidate) === groupKey(item)) === index);
+  const slides = slideSeeds.map((seed) => isDigitalCode(seed)
+    ? products.filter((item) => isDigitalCode(item) && groupKey(item) === groupKey(seed))
+    : [seed]
+  );
   useEffect(() => setActiveIndex(0), [slides.length]);
   useEffect(() => {
     if (slides.length < 2) return undefined;
@@ -96,6 +103,7 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
   const heroVariants = slides[activeIndex] || slides[0] || [];
   const product = heroVariants.find((item) => item.featuredOnHome)
     || heroVariants[0];
+  const productIsDigitalCode = product ? isDigitalCode(product) : false;
   if (!product) {
     if (!showFallback) return null;
     return (
@@ -127,16 +135,16 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
   );
 
   return (
-    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${product.homeHeroLogo ? " has-custom-logo" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
+    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${product.homeHeroLogo ? " has-custom-logo" : ""}`} style={heroBackground} aria-label={`Featured item: ${heroTitle}`}>
       <div className="home-digital-hero-copy">
-        <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || "FEATURED DIGITAL CODE"}</span>
+        <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || `FEATURED ${product.type || (productIsDigitalCode ? "DIGITAL CODE" : "GAMEONIX PICK")}`}</span>
         <h1>{heroTitle}</h1>
         <div className="home-digital-hero-meta">
           {product.publisher && <span>{product.publisher}</span>}
-          {heroVariants.map((variant) => <span className="home-digital-platform-tag" key={variant.id} title={getDigitalCodePlatform(variant)}>
+          {productIsDigitalCode ? heroVariants.map((variant) => <span className="home-digital-platform-tag" key={variant.id} title={getDigitalCodePlatform(variant)}>
             <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
             <i aria-hidden="true">|</i><span>{getDigitalCodePlatform(variant)}</span>
-          </span>)}
+          </span>) : <span className="home-digital-platform-tag">{product.type || product.kind || "Featured"}</span>}
         </div>
         {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}
         {product.homeHeroDescription && <p className="home-digital-hero-description">{product.homeHeroDescription}</p>}
@@ -150,13 +158,13 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
             </div>
           )) : <p>No packages available yet.</p>}
         </div>
-        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?digitalCode=${encodeURIComponent(product.id)}${firstPackageIndex >= 0 ? `&packIndex=${firstPackageIndex}` : ""}#gc-digital-codes`}>
-          <span>Explore this game</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
+        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?featuredProduct=${encodeURIComponent(product.id)}${firstPackageIndex >= 0 ? `&packIndex=${firstPackageIndex}` : ""}#gc-digital-codes`}>
+          <span>{productIsDigitalCode ? "Explore this game" : "Shop this item"}</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
         </Link>
-        {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">
-          <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured digital code"><FontAwesomeIcon icon={faChevronLeft} /></button>
+        {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured items">
+          <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured item"><FontAwesomeIcon icon={faChevronLeft} /></button>
           {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
-          <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured digital code"><FontAwesomeIcon icon={faChevronRight} /></button>
+          <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured item"><FontAwesomeIcon icon={faChevronRight} /></button>
         </div>}
       </div>
       {product.homeHeroLogo && <div className="home-digital-hero-logo" aria-hidden="true"><img src={getDigitalCodeImageUrl(product.homeHeroLogo)} alt="" /></div>}
@@ -480,7 +488,7 @@ function Home() {
 
   return (
     <main className="home-page">
-      <HomeDigitalCodeHero />
+      <HomeFeaturedHero />
 
       {recentlyAddedGames.length > 0 && (
         <GamesCarousel

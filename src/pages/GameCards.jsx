@@ -21,7 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlaystation, faWindows, faXbox } from "@fortawesome/free-brands-svg-icons";
-import { HomeDigitalCodeHero } from "./home";
+import { HomeFeaturedHero } from "./home";
 import EmailSuggestion from "../components/EmailSuggestion";
 import { recordGameActivity } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
@@ -373,15 +373,18 @@ function GameCards() {
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const productId = query.get("digitalCode");
+    const featuredProductId = query.get("featuredProduct");
+    const productId = featuredProductId || query.get("digitalCode");
     const packIndexValue = query.get("packIndex");
     const requestedPackIndex = packIndexValue && /^\d+$/.test(packIndexValue)
       ? Number(packIndexValue)
       : null;
     if (!productId || !catalog.length) return;
 
-    const product = catalog.find(
-      (item) => String(item.id) === productId && getProductKind(item) === "digital-code"
+    const product = catalog.find((item) =>
+      String(item.id) === productId &&
+      item?.able !== false &&
+      (featuredProductId || getProductKind(item) === "digital-code")
     );
     if (!product) return;
 
@@ -863,7 +866,7 @@ function GameCards() {
           </div>
         </header>
 
-        <HomeDigitalCodeHero showFallback={false} />
+        <HomeFeaturedHero showFallback={false} />
 
         <section className="gc-stats">
           <div className="gc-stat">
