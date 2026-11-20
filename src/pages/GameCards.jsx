@@ -269,6 +269,7 @@ function GameCards() {
   const [popularCarouselPaused, setPopularCarouselPaused] = useState(false);
   const [popularCarouselElement, setPopularCarouselElement] = useState(null);
   const checkoutRightRef = useRef(null);
+  const checkoutSubmitLockRef = useRef(false);
   const popularDirectionRef = useRef(1);
   const popularResumeTimerRef = useRef(null);
   const popularInteractionRef = useRef({ pointer: false, focus: false });
@@ -733,6 +734,7 @@ function GameCards() {
 
   async function handleCheckout(event) {
     event.preventDefault();
+    if (checkoutSubmitLockRef.current || checkoutSubmitting) return;
     setCheckoutMessage("");
 
     if (authLoading || !user) {
@@ -803,6 +805,7 @@ function GameCards() {
       return;
     }
 
+    checkoutSubmitLockRef.current = true;
     setCheckoutSubmitting(true);
     try {
       const tokenResponse = await fetch(`${AUTH_API_URL}?token=true`, {
@@ -854,6 +857,7 @@ function GameCards() {
         purchaseError.message || "Unable to submit your purchase request."
       );
     } finally {
+      checkoutSubmitLockRef.current = false;
       setCheckoutSubmitting(false);
     }
   }
