@@ -87,8 +87,19 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
   const legacyDefault = products.some((item) => typeof item.featuredOnHome === "boolean")
     ? []
     : products.filter(isDigitalCode).slice(0, 1);
+  const catalogPositions = new Map(products.map((item, index) => [item.id, index]));
   const slideSeeds = (selectedFeaturedProducts.length ? selectedFeaturedProducts : legacyDefault)
-    .filter((item, index, items) => items.findIndex((candidate) => groupKey(candidate) === groupKey(item)) === index);
+    .filter((item, index, items) => items.findIndex((candidate) => groupKey(candidate) === groupKey(item)) === index)
+    .sort((first, second) => {
+      const firstOrder = Number(first.homeHeroOrder);
+      const secondOrder = Number(second.homeHeroOrder);
+      const firstHasOrder = first.homeHeroOrder !== undefined && first.homeHeroOrder !== null && Number.isFinite(firstOrder);
+      const secondHasOrder = second.homeHeroOrder !== undefined && second.homeHeroOrder !== null && Number.isFinite(secondOrder);
+      if (firstHasOrder && secondHasOrder && firstOrder !== secondOrder) return firstOrder - secondOrder;
+      if (firstHasOrder !== secondHasOrder) return firstHasOrder ? 1 : -1;
+      if (isDigitalCode(first) !== isDigitalCode(second)) return isDigitalCode(first) ? -1 : 1;
+      return (catalogPositions.get(first.id) || 0) - (catalogPositions.get(second.id) || 0);
+    });
   const slides = slideSeeds.map((seed) => isDigitalCode(seed)
     ? products.filter((item) => isDigitalCode(item) && groupKey(item) === groupKey(seed))
     : [seed]
@@ -120,7 +131,7 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
 
   const packages = (product.packs || []).filter((pack, index) =>
     pack?.able !== false && (!Array.isArray(product.homeHeroPackages) || product.homeHeroPackages.includes(index))
-  );
+  ).slice(0, 4);
   const prices = packages.map((pack) => Number(pack?.price)).filter((price) => Number.isFinite(price) && price >= 0);
   const startingPrice = prices.length ? Math.min(...prices) : null;
   const heroImageProduct = heroVariants.find((item) => item.homeHeroImage);
@@ -162,12 +173,10 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
             <span>{productIsDigitalCode ? "Explore this game" : "Shop this item"}</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
           </Link>
         </div>
-        {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured items">
-          <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured item"><FontAwesomeIcon icon={faChevronLeft} /></button>
-          {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
-          <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured item"><FontAwesomeIcon icon={faChevronRight} /></button>
-        </div>}
       </div>
+      {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Choose a featured item">
+        {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
+      </div>}
       {heroLogo && <div className="home-digital-hero-logo" key={heroLogo} aria-hidden="true"><img src={getDigitalCodeImageUrl(heroLogo)} alt="" /></div>}
       {!heroImage && !heroLogo && product.image && <div className="home-digital-hero-art" key={product.id}><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
       <div className="home-digital-hero-glow" aria-hidden="true" />
