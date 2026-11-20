@@ -321,6 +321,19 @@ function GameDetails() {
         mediaImages.find((image) => image.id === selectedImage) ||
         mediaImages[0];
 
+    useEffect(() => {
+        if (mediaImages.length < 2 || !currentImage) return undefined;
+
+        const currentIndex = mediaImages.findIndex(
+            (image) => image.id === currentImage.id
+        );
+        const timeout = window.setTimeout(() => {
+            setSelectedImage(mediaImages[(currentIndex + 1) % mediaImages.length].id);
+        }, 5000);
+
+        return () => window.clearTimeout(timeout);
+    }, [currentImage?.id, mediaImages.length]);
+
     // Change the main screenshot using the main image arrows.
     function selectRelativeImage(direction) {
         if (!mediaImages.length || !currentImage) return;
@@ -625,6 +638,15 @@ function GameDetails() {
                                 </>
                             )}
                         </div>
+
+                        {mediaImages.length > 1 && currentImage && (
+                            <div
+                                className="game-gallery-progress"
+                                aria-hidden="true"
+                            >
+                                <span key={currentImage.id} />
+                            </div>
+                        )}
 
                         {mediaImages.length > 0 && (
                             <div className="game-thumbnails-wrapper">
