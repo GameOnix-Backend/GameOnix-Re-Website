@@ -1337,6 +1337,8 @@
 .gc-checkout-left {
     border-right: 1px solid #303034;
     background: #18181a;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .gc-checkout-right {
@@ -1705,14 +1707,20 @@
 /* Fields card */
 
 .gc-fields-card {
-    display: flex;
-    flex-direction: column;
-    gap: 13px;
-    margin-top: 14px;
-    padding: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 10px 12px;
+    margin-top: 11px;
+    padding: 12px;
     border: 1px solid #303034;
     border-radius: 13px;
     background: #1b1b1e;
+}
+
+.gc-fields-heading,
+.gc-id-format-hint {
+    grid-column: 1 / -1;
 }
 
 .gc-fields-heading {
@@ -2707,6 +2715,18 @@
     .gc-checkout-left {
         border-right: 0;
         border-bottom: 1px solid #303034;
+        overflow-x: visible;
+    }
+
+    .gc-fields-card {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .gc-fields-heading,
+    .gc-id-format-hint {
+        grid-column: auto;
     }
 
     .gc-checkout-right {
