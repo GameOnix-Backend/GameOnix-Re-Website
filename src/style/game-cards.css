@@ -1904,7 +1904,13 @@
             transparent 75%),
         linear-gradient(155deg, #25212b, #19171d);
 
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+}
+
+.gc-pack-card:focus-visible,
+.gc-payment-method:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--gc-selection-color) 76%, white);
+    outline-offset: 2px;
 }
 
 .gc-pack-card:disabled {
@@ -1931,9 +1937,9 @@
         linear-gradient(155deg, #29232f, #1e1b23);
 
     box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--gc-selection-color) 12%, transparent),
-        0 0 0 1px color-mix(in srgb, var(--gc-selection-color) 12%, transparent),
-        0 7px 20px color-mix(in srgb, var(--gc-selection-color) 10%, transparent);
+        inset 0 0 0 1px color-mix(in srgb, var(--gc-selection-color) 18%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--gc-selection-color) 18%, transparent),
+        0 8px 22px color-mix(in srgb, var(--gc-selection-color) 14%, transparent);
 }
 
 .gc-pack-image {
@@ -2122,7 +2128,11 @@
 
 .gc-payment-method:hover:not(:disabled) {
     border-color: #5c5c65;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+}
+
+.gc-payment-method:active:not(:disabled) {
+    transform: scale(0.99);
 }
 
 .gc-payment-method.selected {
@@ -2132,6 +2142,9 @@
                 var(--gc-selection-color) 13%,
                 #1c1c1f),
             #171719);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--gc-selection-color) 15%, transparent),
+        0 5px 16px color-mix(in srgb, var(--gc-selection-color) 10%, transparent);
 }
 
 /* Instant payment label */
