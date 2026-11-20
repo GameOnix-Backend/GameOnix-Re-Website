@@ -146,6 +146,14 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
   return (
     <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${heroLogo ? " has-custom-logo" : ""}`} aria-label={`Featured item: ${heroTitle}`}>
       {heroImage && <div className="home-digital-hero-background" key={heroImage}><img src={heroImage} alt="" /></div>}
+      {slides.length > 1 && <div className="home-digital-hero-nav" aria-label="Featured item navigation">
+        <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured item" title="Previous featured item">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
+        <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured item" title="Next featured item">
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>}
       <div className="home-digital-hero-copy">
         <div className="home-digital-hero-slide" key={groupKey(product)}>
           <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || `FEATURED ${product.type || (productIsDigitalCode ? "DIGITAL CODE" : "GAMEONIX PICK")}`}</span>
