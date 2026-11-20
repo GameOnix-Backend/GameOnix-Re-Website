@@ -125,9 +125,7 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
   const startingPrice = prices.length ? Math.min(...prices) : null;
   const heroImageProduct = heroVariants.find((item) => item.homeHeroImage);
   const heroImage = getDigitalCodeImageUrl(product.homeHeroImage || heroImageProduct?.homeHeroImage);
-  const heroBackground = heroImage
-    ? { backgroundImage: `linear-gradient(90deg, rgba(15, 16, 23, .66) 0%, rgba(15, 16, 23, .5) 22%, rgba(15, 16, 23, .24) 45%, rgba(15, 16, 23, .04) 68%), linear-gradient(0deg, rgba(15, 16, 23, .14), rgba(15, 16, 23, 0) 54%), url("${heroImage}")` }
-    : undefined;
+  const heroLogo = product.homeHeroLogo || heroVariants.find((item) => item.homeHeroLogo)?.homeHeroLogo;
   const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
   const heroTags = [...new Set(heroVariants.flatMap((item) => Array.isArray(item.homeHeroTags) ? item.homeHeroTags.filter(Boolean) : []))];
   const firstPackageIndex = (product.packs || []).findIndex(
@@ -135,40 +133,43 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
   );
 
   return (
-    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${product.homeHeroLogo ? " has-custom-logo" : ""}`} style={heroBackground} aria-label={`Featured item: ${heroTitle}`}>
+    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${heroLogo ? " has-custom-logo" : ""}`} aria-label={`Featured item: ${heroTitle}`}>
+      {heroImage && <div className="home-digital-hero-background" key={heroImage}><img src={heroImage} alt="" /></div>}
       <div className="home-digital-hero-copy">
-        <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || `FEATURED ${product.type || (productIsDigitalCode ? "DIGITAL CODE" : "GAMEONIX PICK")}`}</span>
-        <h1>{heroTitle}</h1>
-        <div className="home-digital-hero-meta">
-          {product.publisher && <span>{product.publisher}</span>}
-          {productIsDigitalCode ? heroVariants.map((variant) => <span className="home-digital-platform-tag" key={variant.id} title={getDigitalCodePlatform(variant)}>
-            <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
-            <i aria-hidden="true">|</i><span>{getDigitalCodePlatform(variant)}</span>
-          </span>) : <span className="home-digital-platform-tag">{product.type || product.kind || "Featured"}</span>}
+        <div className="home-digital-hero-slide" key={groupKey(product)}>
+          <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || `FEATURED ${product.type || (productIsDigitalCode ? "DIGITAL CODE" : "GAMEONIX PICK")}`}</span>
+          <h1>{heroTitle}</h1>
+          <div className="home-digital-hero-meta">
+            {product.publisher && <span>{product.publisher}</span>}
+            {productIsDigitalCode ? heroVariants.map((variant) => <span className="home-digital-platform-tag" key={variant.id} title={getDigitalCodePlatform(variant)}>
+              <FontAwesomeIcon icon={variant.platform === "playstation" ? faPlaystation : variant.platform === "xbox" ? faXbox : variant.platform === "pc" ? faWindows : faGamepad} />
+              <i aria-hidden="true">|</i><span>{getDigitalCodePlatform(variant)}</span>
+            </span>) : <span className="home-digital-platform-tag">{product.type || product.kind || "Featured"}</span>}
+          </div>
+          <div className="home-digital-hero-tags">{heroTags.slice(0, 4).map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>
+          <p className="home-digital-hero-description">{product.homeHeroDescription || " "}</p>
+          <p className="home-digital-starting-price">{startingPrice !== null ? `Starting from ${formatDigitalCodePrice(startingPrice)}` : "Explore this featured product"}</p>
+          <div className="home-digital-packages" aria-label="Available editions and prices">
+            {packages.length ? packages.map((pack, index) => (
+              <div className={`home-digital-package${pack.stock === false ? " is-out-of-stock" : ""}`} key={`${pack.title}-${index}`}>
+                <span>{[pack.title, pack.type].filter(Boolean).join(" ")}</span>
+                <strong>{formatDigitalCodePrice(pack.price)}</strong>
+                {pack.oldPrice && <del>{formatDigitalCodePrice(pack.oldPrice)}</del>}
+              </div>
+            )) : <p>No packages available yet.</p>}
+          </div>
+          <Link className="home-digital-hero-cta" to={`/shopping/game-cards?featuredProduct=${encodeURIComponent(product.id)}${firstPackageIndex >= 0 ? `&packIndex=${firstPackageIndex}` : ""}#gc-store`}>
+            <span>{productIsDigitalCode ? "Explore this game" : "Shop this item"}</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
+          </Link>
         </div>
-        {heroTags.length > 0 && <div className="home-digital-hero-tags">{heroTags.map((tag, index) => <span key={`${tag}-${index}`}>{tag}</span>)}</div>}
-        {product.homeHeroDescription && <p className="home-digital-hero-description">{product.homeHeroDescription}</p>}
-        {startingPrice !== null && <p className="home-digital-starting-price">Starting from {formatDigitalCodePrice(startingPrice)}</p>}
-        <div className="home-digital-packages" aria-label="Available editions and prices">
-          {packages.length ? packages.map((pack, index) => (
-            <div className={`home-digital-package${pack.stock === false ? " is-out-of-stock" : ""}`} key={`${pack.title}-${index}`}>
-              <span>{[pack.title, pack.type].filter(Boolean).join(" ")}</span>
-              <strong>{formatDigitalCodePrice(pack.price)}</strong>
-              {pack.oldPrice && <del>{formatDigitalCodePrice(pack.oldPrice)}</del>}
-            </div>
-          )) : <p>No packages available yet.</p>}
-        </div>
-        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?featuredProduct=${encodeURIComponent(product.id)}${firstPackageIndex >= 0 ? `&packIndex=${firstPackageIndex}` : ""}#gc-digital-codes`}>
-          <span>{productIsDigitalCode ? "Explore this game" : "Shop this item"}</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
-        </Link>
         {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured items">
           <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + slides.length) % slides.length)} aria-label="Previous featured item"><FontAwesomeIcon icon={faChevronLeft} /></button>
           {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
           <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured item"><FontAwesomeIcon icon={faChevronRight} /></button>
         </div>}
       </div>
-      {product.homeHeroLogo && <div className="home-digital-hero-logo" aria-hidden="true"><img src={getDigitalCodeImageUrl(product.homeHeroLogo)} alt="" /></div>}
-      {!heroImage && !product.homeHeroLogo && product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
+      {heroLogo && <div className="home-digital-hero-logo" key={heroLogo} aria-hidden="true"><img src={getDigitalCodeImageUrl(heroLogo)} alt="" /></div>}
+      {!heroImage && !heroLogo && product.image && <div className="home-digital-hero-art" key={product.id}><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
       <div className="home-digital-hero-glow" aria-hidden="true" />
     </section>
   );

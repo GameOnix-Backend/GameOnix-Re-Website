@@ -390,7 +390,7 @@ function GameCards() {
 
     setActiveCategory("All");
     setSearch("");
-    document.getElementById("gc-digital-codes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("gc-store")?.scrollIntoView({ behavior: "smooth", block: "start" });
     void openProduct(product, Number.isInteger(requestedPackIndex) ? requestedPackIndex : null);
     navigate(`${location.pathname}#gc-digital-codes`, { replace: true });
   }, [catalog, location.pathname, location.search, navigate]);
