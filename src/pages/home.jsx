@@ -123,7 +123,7 @@ function HomeDigitalCodeHero() {
   const heroTags = [...new Set(heroVariants.flatMap((item) => Array.isArray(item.homeHeroTags) ? item.homeHeroTags.filter(Boolean) : []))];
 
   return (
-    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
+    <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${product.homeHeroLogo ? " has-custom-logo" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
       <div className="home-digital-hero-copy">
         <span className="home-digital-hero-kicker">{product.homeHeroEyebrow || "FEATURED DIGITAL CODE"}</span>
         <h1>{heroTitle}</h1>
@@ -155,7 +155,8 @@ function HomeDigitalCodeHero() {
           <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % slides.length)} aria-label="Next featured digital code"><FontAwesomeIcon icon={faChevronRight} /></button>
         </div>}
       </div>
-      {!heroImage && product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
+      {product.homeHeroLogo && <div className="home-digital-hero-logo" aria-hidden="true"><img src={getDigitalCodeImageUrl(product.homeHeroLogo)} alt="" /></div>}
+      {!heroImage && !product.homeHeroLogo && product.image && <div className="home-digital-hero-art"><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
       <div className="home-digital-hero-glow" aria-hidden="true" />
     </section>
   );
