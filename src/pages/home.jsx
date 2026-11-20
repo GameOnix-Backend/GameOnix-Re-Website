@@ -122,6 +122,9 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
     : undefined;
   const heroTitle = String(product.homeHeroTitle || product.name || "").trim();
   const heroTags = [...new Set(heroVariants.flatMap((item) => Array.isArray(item.homeHeroTags) ? item.homeHeroTags.filter(Boolean) : []))];
+  const firstPackageIndex = (product.packs || []).findIndex(
+    (pack) => pack?.able !== false && pack?.stock !== false
+  );
 
   return (
     <section className={`home-digital-hero${heroImage ? " has-custom-image" : ""}${product.homeHeroLogo ? " has-custom-logo" : ""}`} style={heroBackground} aria-label={`Featured digital code: ${heroTitle}`}>
@@ -147,7 +150,7 @@ export function HomeDigitalCodeHero({ showFallback = true } = {}) {
             </div>
           )) : <p>No packages available yet.</p>}
         </div>
-        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?digitalCode=${encodeURIComponent(product.id)}#gc-digital-codes`}>
+        <Link className="home-digital-hero-cta" to={`/shopping/game-cards?digitalCode=${encodeURIComponent(product.id)}${firstPackageIndex >= 0 ? `&packIndex=${firstPackageIndex}` : ""}#gc-digital-codes`}>
           <span>Explore this game</span><i><FontAwesomeIcon icon={faChevronRight} /></i>
         </Link>
         {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Featured digital codes">

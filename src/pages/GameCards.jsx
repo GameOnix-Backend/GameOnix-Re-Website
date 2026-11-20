@@ -372,7 +372,12 @@ function GameCards() {
   }, []);
 
   useEffect(() => {
-    const productId = new URLSearchParams(location.search).get("digitalCode");
+    const query = new URLSearchParams(location.search);
+    const productId = query.get("digitalCode");
+    const packIndexValue = query.get("packIndex");
+    const requestedPackIndex = packIndexValue && /^\d+$/.test(packIndexValue)
+      ? Number(packIndexValue)
+      : null;
     if (!productId || !catalog.length) return;
 
     const product = catalog.find(
@@ -383,7 +388,7 @@ function GameCards() {
     setActiveCategory("All");
     setSearch("");
     document.getElementById("gc-digital-codes")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    void openProduct(product);
+    void openProduct(product, Number.isInteger(requestedPackIndex) ? requestedPackIndex : null);
     navigate(`${location.pathname}#gc-digital-codes`, { replace: true });
   }, [catalog, location.pathname, location.search, navigate]);
 
@@ -597,7 +602,7 @@ function GameCards() {
     )
   ).length;
 
-  async function openProduct(product) {
+  async function openProduct(product, initialPackIndex = null) {
     const packs = (product.packs || []).filter(
       (pack) => pack?.able !== false
     );
@@ -606,7 +611,14 @@ function GameCards() {
     }
 
     setSelectedProduct(product);
-    setSelectedPack(null);
+    const initialPack = Number.isInteger(initialPackIndex)
+      ? (product.packs || [])[initialPackIndex]
+      : null;
+    setSelectedPack(
+      initialPack && packs.includes(initialPack) && isPackInStock(initialPack)
+        ? initialPack
+        : null
+    );
     setQuantity(1);
     setSelectedPayment(paymentMethods.find((method) => method.av)?.name || "");
     setPlayerId("");
