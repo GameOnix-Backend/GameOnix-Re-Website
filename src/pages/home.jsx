@@ -107,9 +107,9 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
   useEffect(() => setActiveIndex(0), [slides.length]);
   useEffect(() => {
     if (slides.length < 2) return undefined;
-    const timer = window.setInterval(() => setActiveIndex((index) => (index + 1) % slides.length), 7000);
-    return () => window.clearInterval(timer);
-  }, [slides.length]);
+    const timer = window.setTimeout(() => setActiveIndex((index) => (index + 1) % slides.length), 7000);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, slides.length]);
 
   const heroVariants = slides[activeIndex] || slides[0] || [];
   const product = heroVariants.find((item) => item.featuredOnHome)
@@ -175,7 +175,10 @@ export function HomeFeaturedHero({ showFallback = true } = {}) {
         </div>
       </div>
       {slides.length > 1 && <div className="home-digital-hero-controls" aria-label="Choose a featured item">
-        {slides.map((variants, index) => <button type="button" className={index === activeIndex ? "active" : ""} key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
+        <div className="home-digital-hero-control-dots">
+          {slides.map((variants, index) => <button type="button" key={groupKey(variants[0])} onClick={() => setActiveIndex(index)} aria-label={`Show ${variants[0].name}`} aria-pressed={index === activeIndex} />)}
+        </div>
+        <span className="home-digital-hero-progress" key={activeIndex} aria-hidden="true"><i /></span>
       </div>}
       {heroLogo && <div className="home-digital-hero-logo" key={heroLogo} aria-hidden="true"><img src={getDigitalCodeImageUrl(heroLogo)} alt="" /></div>}
       {!heroImage && !heroLogo && product.image && <div className="home-digital-hero-art" key={product.id}><img src={getDigitalCodeImageUrl(product.image)} alt={heroTitle} /></div>}
