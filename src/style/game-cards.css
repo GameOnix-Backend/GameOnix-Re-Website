@@ -1343,8 +1343,59 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: linear-gradient(145deg, #1b1b1e, #171719);
+}
+
+.gc-checkout-toast {
+    position: fixed;
+    z-index: 10001;
+    right: 24px;
+    bottom: 24px;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 28px;
+    align-items: center;
+    gap: 11px;
+    width: min(430px, calc(100vw - 32px));
+    padding: 14px 12px;
+    border: 1px solid #32c985;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #123c2c, #10271f);
+    box-shadow: 0 16px 45px #0009, 0 0 24px #28bb7428;
+    color: #e4fff1;
+    font-size: 12px;
+    line-height: 1.6;
+    animation: gc-checkout-toast-in .24s ease-out both;
+}
+
+.gc-checkout-toast-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    background: #2cc77b;
+    color: #092417;
+}
+
+.gc-checkout-toast button {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #b7e9cc;
+    cursor: pointer;
+}
+
+.gc-checkout-toast button:hover { background: #ffffff14; color: #fff; }
+
+@keyframes gc-checkout-toast-in {
+    from { opacity: 0; transform: translateX(18px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 /* Contact card */

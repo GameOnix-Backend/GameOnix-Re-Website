@@ -262,6 +262,7 @@ function GameCards() {
   const [checkoutMessage, setCheckoutMessage] = useState("");
   const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
   const [checkoutOrderSubmitted, setCheckoutOrderSubmitted] = useState(false);
+  const [checkoutToast, setCheckoutToast] = useState("");
   const [walletBalance, setWalletBalance] = useState(null);
   const [walletBalanceLoading, setWalletBalanceLoading] = useState(false);
   const [walletBalanceError, setWalletBalanceError] = useState("");
@@ -686,6 +687,12 @@ function GameCards() {
   }
 
   useEffect(() => {
+    if (!checkoutToast) return undefined;
+    const timeout = window.setTimeout(() => setCheckoutToast(""), 5000);
+    return () => window.clearTimeout(timeout);
+  }, [checkoutToast]);
+
+  useEffect(() => {
     if (!selectedProduct) return undefined;
 
     const previousOverflow = document.body.style.overflow;
@@ -836,9 +843,10 @@ function GameCards() {
       }
 
       setCheckoutOrderSubmitted(true);
-      setCheckoutMessage(
-        `Order request ${data.request.id.slice(0, 8)} for ${formatPrice(data.request.amount)} using ${selectedPaymentMethod.name} was sent for review. ${selectedPaymentMethod.isWallet ? "Your wallet will only be charged after approval." : "This request will be reviewed without charging your wallet."}${data.adminEmailSent ? "" : " The request was saved, but admin email delivery failed; please contact support."}`
+      setCheckoutToast(
+        `Order request ${data.request.id.slice(0, 8)} was sent for review.${data.adminEmailSent ? "" : " The request was saved, but admin email delivery failed; please contact support."}`
       );
+      closeProduct();
       window.dispatchEvent(new Event("wallet-notifications-updated"));
     } catch (purchaseError) {
       console.error("Game purchase request failed:", purchaseError);
@@ -1934,6 +1942,16 @@ function GameCards() {
             </form>
             )}
           </section>
+        </div>
+      )}
+
+      {checkoutToast && (
+        <div className="gc-checkout-toast" role="status" aria-live="polite">
+          <span className="gc-checkout-toast-icon"><FontAwesomeIcon icon={faCheck} /></span>
+          <span>{checkoutToast}</span>
+          <button type="button" onClick={() => setCheckoutToast("")} aria-label="Dismiss notification">
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
         </div>
       )}
     </main>
