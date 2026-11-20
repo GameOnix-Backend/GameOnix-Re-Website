@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCompass,
   faMagnifyingGlass,
   faGamepad,
   faRotate,
@@ -135,55 +134,6 @@ function Discover() {
   return (
     <main className="discover-page">
       <HomeDigitalCodeHero showFallback={false} />
-      <section className="discover-hero">
-        <div className="discover-hero-content">
-          <span className="discover-eyebrow">
-            <FontAwesomeIcon icon={faCompass} />
-            EXPLORE THE GAMEONIX LIBRARY
-          </span>
-
-          <h1>
-            Discover your next
-            <span> adventure.</span>
-          </h1>
-
-          <p>
-            Search, explore, and find the games worth playing.
-            Your next favorite world is waiting.
-          </p>
-
-          <div className="discover-hero-stats">
-            <div>
-              <strong>{games.length}</strong>
-              <span>Games to explore</span>
-            </div>
-
-            <span className="discover-stat-divider" />
-
-            <div>
-              <strong>{platforms.length}</strong>
-              <span>Platforms</span>
-            </div>
-
-            <span className="discover-stat-divider" />
-
-            <div>
-              <strong>{genres.length}</strong>
-              <span>Genres</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="discover-hero-art" aria-hidden="true">
-          <div className="discover-art-glow" />
-          <div className="discover-art-icon">
-            <FontAwesomeIcon icon={faGamepad} />
-          </div>
-          <span className="discover-art-orbit discover-art-orbit-one" />
-          <span className="discover-art-orbit discover-art-orbit-two" />
-        </div>
-      </section>
-
       <section className="discover-library">
         <div className="discover-section-heading">
           <div>

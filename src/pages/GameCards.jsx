@@ -853,57 +853,6 @@ function GameCards() {
 
         <HomeDigitalCodeHero showFallback={false} />
 
-        <section className="gc-hero">
-          <div className="gc-hero-content">
-            <span className="gc-eyebrow">
-              <FontAwesomeIcon icon={faBolt} />
-              GAMEONIX SHOP
-            </span>
-
-            <h1>
-              Power up your
-              <br />
-              <span>next adventure.</span>
-            </h1>
-
-            <p>
-              Choose your game, select the pack you need, and review your order
-              in one place.
-            </p>
-
-            <button
-              type="button"
-              className="gc-hero-button"
-              onClick={() =>
-                document.getElementById("gc-store")?.scrollIntoView({
-                  behavior: "smooth",
-                })
-              }
-            >
-              Explore store <FontAwesomeIcon icon={faArrowRight} />
-            </button>
-          </div>
-
-          <div className="gc-hero-art" aria-hidden="true">
-            <div className="gc-art-orbit gc-art-orbit-one" />
-            <div className="gc-art-orbit gc-art-orbit-two" />
-
-            <div className="gc-art-card gc-art-card-back">
-              <FontAwesomeIcon icon={faCreditCard} />
-            </div>
-
-            <div className="gc-art-card gc-art-card-front">
-              <span>GAME</span>
-              <strong>ONIX</strong>
-              <FontAwesomeIcon icon={faGamepad} />
-              <small>DIGITAL GOODS</small>
-            </div>
-
-            <div className="gc-art-spark gc-art-spark-one">✦</div>
-            <div className="gc-art-spark gc-art-spark-two">✧</div>
-          </div>
-        </section>
-
         <section className="gc-stats">
           <div className="gc-stat">
             <span className="gc-stat-icon">
