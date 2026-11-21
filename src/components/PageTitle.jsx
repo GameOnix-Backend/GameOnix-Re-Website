@@ -43,6 +43,7 @@ const DEFAULT_DESCRIPTION =
 
 const PRIVATE_ROUTES = [
   "/login",
+  "/desktop-login",
   "/register",
   "/profile",
   "/wallet",
