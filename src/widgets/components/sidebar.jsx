@@ -20,6 +20,7 @@ import {
   faBell,
   faReceipt,
   faHeadset,
+  faBug,
   faScrewdriverWrench,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
@@ -74,6 +75,7 @@ const navigation = [
         requiresAdmin: true,
       },
       { label: "Support tickets", to: "/support", icon: faHeadset },
+      { label: "Report a problem", to: "/report-problem", icon: faBug },
     ],
   },
 ];
