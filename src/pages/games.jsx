@@ -207,13 +207,11 @@ function Games() {
       ) : (
         <div className="games-grid">
           {filteredGames.map((game) => (
-            <div className="game-card-analytics-wrap" key={game.slug}>
             <GameCard
+              key={game.slug}
               game={game}
               badgeType={getGameBadgeType(game, now)}
             />
-            <div className="game-card-analytics"><span>{analyticsBySlug.get(game.slug)?.downloads || 0} downloads</span><span>{analyticsBySlug.get(game.slug)?.views || 0} views</span><span>{analyticsBySlug.get(game.slug)?.favorites || 0} favorites</span><span>{analyticsBySlug.get(game.slug)?.follows || 0} follows</span></div>
-            </div>
           ))}
         </div>
       )}
