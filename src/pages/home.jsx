@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
   faGamepad,
+  faClock,
+  faLock,
   faMobileScreenButton,
   faRotate,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faPlaystation,
@@ -429,8 +432,53 @@ function HomeDiscovery({ games }) {
   );
 }
 
+function HomeEditorialSection({ section, games }) {
+  const picks = (section.gameSlugs || []).map((slug) => games.find((game) => game.slug === slug))
+    .filter((game) => game && game.availability !== false).slice(0, 8);
+  if (!picks.length) return null;
+  if (section.layout === "feature") {
+    const [lead, ...rest] = picks;
+    const image = lead.homeFeatureImage || lead.poster || lead.game_poster;
+    return <section className="home-editorial home-editorial-feature">
+      <header className="home-editorial-heading"><span>GAMEONIX COLLECTION</span><h2>{section.title || "Featured collection"}</h2>{section.subtitle && <p>{section.subtitle}</p>}</header>
+      <div className="home-editorial-feature-layout">
+        <Link className="home-editorial-lead" to={`/game/${encodeURIComponent(lead.slug)}`}>
+          {image && <img src={image} alt="" loading="lazy" />}<span className="home-editorial-lead-shade" />
+          <span className="home-editorial-lead-copy"><small>EDITOR'S PICK</small><strong>{lead.title}</strong><span>Explore game <FontAwesomeIcon icon={faChevronRight} /></span></span>
+        </Link>
+        <div className="home-editorial-feature-cards">{rest.slice(0, 4).map((game) => <GameCard key={game.slug} game={game} className="home-game-card" />)}</div>
+      </div>
+    </section>;
+  }
+  return <section className="home-editorial home-editorial-shelf">
+    <header className="home-editorial-heading"><div><span>CURATED FOR YOU</span><h2>{section.title || "Game collection"}</h2>{section.subtitle && <p>{section.subtitle}</p>}</div><Link to="/games">Explore all <FontAwesomeIcon icon={faChevronRight} /></Link></header>
+    <div className="home-editorial-shelf-row">{picks.map((game) => <GameCard key={game.slug} game={game} className="home-game-card" />)}</div>
+  </section>;
+}
+
+function HomeComingSoon({ items }) {
+  const [selected, setSelected] = useState(null);
+  const visibleItems = (items || []).filter((item) => item.title);
+  if (!visibleItems.length) return null;
+  return <>
+    <section className="home-coming-soon">
+      <header className="home-editorial-heading"><div><span><FontAwesomeIcon icon={faClock} /> NEXT UP</span><h2>Coming Soon</h2><p>New worlds are on the way.</p></div><span className="home-coming-soon-badge">COMING SOON</span></header>
+      <div className="home-coming-soon-grid">{visibleItems.map((item) => <button type="button" className="home-coming-soon-card" key={item.id} disabled={!item.clickable} onClick={() => setSelected(item)} aria-label={item.clickable ? `View ${item.title} preview` : `${item.title}, coming soon`}>
+        <span className="home-coming-soon-art">{item.image ? <img src={item.image} alt="" loading="lazy" /> : <FontAwesomeIcon icon={faGamepad} />}</span>
+        <span className="home-coming-soon-copy"><small><FontAwesomeIcon icon={faClock} /> Coming Soon</small><strong>{item.title}</strong>{item.description && <span>{item.description}</span>}</span>
+        <span className="home-coming-soon-lock" aria-hidden="true"><FontAwesomeIcon icon={item.clickable ? faChevronRight : faLock} /></span>
+      </button>)}</div>
+    </section>
+    {selected && <div className="home-coming-soon-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="home-coming-soon-dialog" role="dialog" aria-modal="true" aria-labelledby="coming-soon-title">
+      <button type="button" className="home-coming-soon-close" onClick={() => setSelected(null)} aria-label="Close preview"><FontAwesomeIcon icon={faXmark} /></button>
+      {selected.image && <img className="home-coming-soon-dialog-art" src={selected.image} alt="" />}
+      <div className="home-coming-soon-dialog-copy"><span><FontAwesomeIcon icon={faClock} /> COMING SOON</span><h2 id="coming-soon-title">{selected.title}</h2><p>{selected.description || "This game is on its way. Check back soon for updates."}</p><small><FontAwesomeIcon icon={faLock} /> Downloads unlock when the game is released.</small></div>
+    </section></div>}
+  </>;
+}
+
 function Home() {
-  const { games, loading, error, refreshGames } = useGameCatalog();
+  const { games, homeSections, comingSoon, loading, error, refreshGames } = useGameCatalog();
   const [clock, setClock] = useState(Date.now());
 
   useEffect(() => {
@@ -537,12 +585,15 @@ function Home() {
     id: "recently-updated",
     type: "Recently Updated",
   };
+  let categorySectionIndex = 0;
+  let editorialSectionIndex = 0;
 
   return (
     <main className="home-page">
       <HomeFeaturedHero />
 
       <HomeDiscovery games={games} />
+      <HomeComingSoon items={comingSoon} />
 
       {recentlyAddedGames.length > 0 && (
         <GamesCarousel
@@ -607,19 +658,26 @@ function Home() {
                 No games available for this platform yet.
               </p>
             ) : (
-              platformSection.categories.map((category) => (
-                <GamesCarousel
-                  key={`${platformSection.id}-${category.type}`}
-                  games={category.games}
-                  platform={platformSection}
-                  category={category}
-                  now={clock}
-                />
-              ))
+              platformSection.categories.map((category) => {
+                categorySectionIndex += 1;
+                const editorialSection = categorySectionIndex % 3 === 0
+                  ? homeSections[editorialSectionIndex++]
+                  : null;
+                return <Fragment key={`${platformSection.id}-${category.type}`}>
+                  <GamesCarousel
+                    games={category.games}
+                    platform={platformSection}
+                    category={category}
+                    now={clock}
+                  />
+                  {editorialSection && <HomeEditorialSection key={editorialSection.id} section={editorialSection} games={games} />}
+                </Fragment>;
+              })
             )}
           </section>
         );
       })}
+      {homeSections.slice(editorialSectionIndex).map((section) => <HomeEditorialSection key={section.id} section={section} games={games} />)}
     </main>
   );
 }

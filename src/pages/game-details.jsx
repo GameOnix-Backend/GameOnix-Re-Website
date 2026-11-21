@@ -547,7 +547,7 @@ function GameDetails() {
                 <button
                     type="button"
                     className={activeTab === "overview" ? "active" : ""}
-                    onClick={() => setActiveTab("overview")}
+                    onClick={() => { setActiveTab("overview"); document.getElementById("game-overview")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
                 >
                     Overview
                 </button>
@@ -555,7 +555,7 @@ function GameDetails() {
                 <button
                     type="button"
                     className={activeTab === "addons" ? "active" : ""}
-                    onClick={() => setActiveTab("addons")}
+                    onClick={() => { setActiveTab("addons"); document.getElementById("game-addons-section")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
                     aria-label={
                         addons.length
                             ? `Add-Ons, ${addons.length} available`
@@ -573,7 +573,7 @@ function GameDetails() {
                 <button
                     type="button"
                     className={activeTab === "requirements" ? "active" : ""}
-                    onClick={() => setActiveTab("requirements")}
+                    onClick={() => { setActiveTab("requirements"); document.getElementById("game-requirements-section")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
                 >
                     Requirements
                 </button>
@@ -581,14 +581,13 @@ function GameDetails() {
                 <button
                     type="button"
                     className={activeTab === "reviews" ? "active" : ""}
-                    onClick={() => setActiveTab("reviews")}
+                    onClick={() => { setActiveTab("reviews"); document.getElementById("game-reviews-section")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
                 >
                     Reviews
                 </button>
             </nav>
 
-            {activeTab === "overview" ? (
-                <section className="game-layout">
+            <section className="game-layout" id="game-overview">
                     <div className="game-gallery">
                         <div className="game-main-image">
                             {currentImage ? (
@@ -906,14 +905,18 @@ function GameDetails() {
                             Check the game details before downloading.
                         </p>
                     </aside>
-                </section>
-            ) : activeTab === "addons" ? (
+            </section>
+            <section className="game-scroll-section" id="game-addons-section">
+                <div className="game-scroll-heading"><span>MORE TO PLAY</span><h2>Extra content</h2><p>Expansions, DLC, and bonus content for {game.title}.</p></div>
                 <AddonsPanel addons={addons} />
-            ) : activeTab === "requirements" ? (
+            </section>
+            <section className="game-scroll-section" id="game-requirements-section">
                 <RequirementsPanel game={game} />
-            ) : (
+            </section>
+            <section className="game-scroll-section" id="game-reviews-section">
+                <div className="game-scroll-heading"><span>PLAYER COMMUNITY</span><h2>Reviews and ratings</h2><p>See what players think and share your experience.</p></div>
                 <GameReviews slug={game.slug} title={game.title} />
-            )}
+            </section>
             {relatedGames.length > 0 && (
                 <section className="game-related-section" aria-labelledby="game-related-title">
                     <div className="game-related-heading">

@@ -66,10 +66,17 @@
 /* Tabs */
 
 .game-tabs {
+    position: sticky;
+    top: 10px;
+    z-index: 20;
     display: flex;
     gap: 26px;
     margin: 28px 0 25px;
+    padding: 13px 16px 0;
     border-bottom: 1px solid var(--game-border);
+    border-radius: 12px 12px 0 0;
+    background: color-mix(in srgb, var(--game-bg) 90%, transparent);
+    backdrop-filter: blur(12px);
 }
 
 .game-tabs button {
@@ -101,6 +108,13 @@
     background: var(--game-accent);
     content: "";
 }
+
+.game-layout,.game-scroll-section,.game-related-section { scroll-margin-top: 92px; }
+.game-scroll-section { margin-top: 56px; padding-top: 30px; border-top: 1px solid color-mix(in srgb,var(--game-border) 76%,transparent); }
+.game-scroll-heading { margin-bottom: 19px; }
+.game-scroll-heading > span { color: #a995ff; font-size: 10px; font-weight: 850; letter-spacing: 1.2px; }
+.game-scroll-heading h2 { margin: 7px 0 5px; color: var(--game-text); font-size: clamp(23px,3vw,31px); letter-spacing: -.6px; }
+.game-scroll-heading p { margin: 0; color: var(--game-muted); font-size: 12px; line-height: 1.7; }
 
 /* Main layout */
 

@@ -5,7 +5,7 @@ const GAMES_DATA_URL =
 const REFRESH_INTERVAL = 15_000;
 const CATALOG_TRACKING_KEY = "gameonix_catalog_tracking_v1";
 
-let snapshot = { games: [], loading: true, error: "" };
+let snapshot = { games: [], homeSections: [], comingSoon: [], loading: true, error: "" };
 let refreshTimer;
 let activeRequest;
 const listeners = new Set();
@@ -75,7 +75,13 @@ async function refreshGames() {
       if (!games.length && snapshot.games.length) {
         throw new Error("The games catalog returned no entries");
       }
-      publish({ games: trackNewGames(games), loading: false, error: "" });
+      publish({
+        games: trackNewGames(games),
+        homeSections: Array.isArray(data?.homeSections) ? data.homeSections : [],
+        comingSoon: Array.isArray(data?.comingSoon) ? data.comingSoon : [],
+        loading: false,
+        error: "",
+      });
     } catch {
       publish({
         ...snapshot,
