@@ -399,14 +399,17 @@ function GamesCarousel({ games, platform, category, now }) {
 }
 
 function HomeDiscovery({ games }) {
-  const picks = games.slice(0, 7);
+  const featuredGames = games.filter((game) => game.featuredOnHome).slice().sort((left, right) =>
+    (Number(left.homeFeatureOrder) || 0) - (Number(right.homeFeatureOrder) || 0)
+  );
+  const picks = (featuredGames.length ? featuredGames : games).slice(0, 7);
   if (!picks.length) return null;
   const [featured, ...more] = picks;
 
   return (
     <section className="home-discovery" aria-label="Discover games">
       <Link className="home-discovery-feature" to={`/game/${encodeURIComponent(featured.slug)}`}>
-        {featured.poster && <img src={featured.poster} alt="" loading="lazy" />}
+        {(featured.homeFeatureImage || featured.poster || featured.game_poster) && <img src={featured.homeFeatureImage || featured.poster || featured.game_poster} alt="" loading="lazy" />}
         <span className="home-discovery-shade" />
         <span className="home-discovery-copy">
           <small>DISCOVER SOMETHING NEW</small>
@@ -417,8 +420,8 @@ function HomeDiscovery({ games }) {
       <div className="home-discovery-list">
         <header><span>Handpicked for you</span><Link to="/games">View all <FontAwesomeIcon icon={faChevronRight} /></Link></header>
         {more.map((game) => <Link className="home-discovery-item" to={`/game/${encodeURIComponent(game.slug)}`} key={game.id ?? game.slug}>
-          {game.poster ? <img src={game.poster} alt="" loading="lazy" /> : <span className="home-discovery-thumb"><FontAwesomeIcon icon={faGamepad} /></span>}
-          <span><strong>{game.title}</strong><small>{[game.publisher, getGameCategories(game)[0]].filter(Boolean).join(" · ") || "Explore game details"}</small></span>
+          {game.homeFeatureImage || game.poster || game.game_poster ? <img src={game.homeFeatureImage || game.poster || game.game_poster} alt="" loading="lazy" /> : <span className="home-discovery-thumb"><FontAwesomeIcon icon={faGamepad} /></span>}
+          <span><strong>{game.title}</strong><small>{[game.publisher, getGameCategories(game)[0]].filter(Boolean).join(" / ") || "Explore game details"}</small></span>
           <FontAwesomeIcon className="home-discovery-arrow" icon={faChevronRight} />
         </Link>)}
       </div>
