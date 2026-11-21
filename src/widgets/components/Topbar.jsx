@@ -794,6 +794,7 @@ function Topbar() {
                 </div>
 
                 <div className="topbar-status has-account-actions">
+                    <Link to="/launcher" className="topbar-launcher-link">Get GameOnix Launcher</Link>
                     <div className="topbar-account-actions" ref={accountActionsRef}>
                             <div className="topbar-account-action-wrap">
                                 <button

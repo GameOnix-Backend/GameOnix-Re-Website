@@ -18,6 +18,8 @@ const pageTitles = {
   "/orders": "My Orders",
   "/support": "Support",
   "/reviews": "GameOnix Reviews",
+  "/launcher": "Get GameOnix Launcher",
+  "/desktop-login": "Sign in to GameOnix Desktop",
   "/search": "Search Games",
   "/shopping/game-cards": "Shopping",
 };
@@ -33,6 +35,7 @@ const pageDescriptions = {
     "Explore game cards and digital cards available through GameOnix.",
   "/reviews":
     "Read community feedback and share your experience with the GameOnix website.",
+  "/launcher": "Download the GameOnix Desktop launcher for Windows and manage your game library in one place.",
 };
 
 const DEFAULT_DESCRIPTION =

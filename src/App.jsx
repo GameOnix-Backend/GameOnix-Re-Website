@@ -20,6 +20,8 @@ import Notifications, { AdminActions } from "./pages/Notifications";
 import Orders from "./pages/Orders";
 import Support from "./pages/Support";
 import ReviewsPage from "./pages/reviews";
+import Launcher from "./pages/launcher";
+import DesktopLogin from "./pages/desktop-login";
 
 import PageTitle from "./components/PageTitle";
 import "./style/site-control.css";
@@ -138,6 +140,8 @@ function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/support" element={<Support />} />
           <Route path="/report-problem" element={<Support initialReport />} />
+          <Route path="/launcher" element={<Launcher />} />
+          <Route path="/desktop-login" element={<DesktopLogin />} />
           <Route path="/reviews" element={<ReviewsPage />} />
 
           <Route path="/games" element={<Games />} />
