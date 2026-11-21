@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { getCommunityApiToken } from "../api/session";
+import { getSessionToken } from "../api/session";
 import { useAuth } from "../context/AuthContext";
 import "../style/launcher-style.css";
 
@@ -36,7 +36,8 @@ export default function DesktopLogin() {
     setState("connecting");
     (async () => {
       try {
-        const token = await getCommunityApiToken();
+        const token = getSessionToken();
+        if (!token) throw new Error("No active website session was found. Sign in on the website and try again.");
         const key = await window.crypto.subtle.importKey("raw", fromBase64Url(keyValue), { name: "AES-GCM" }, false, ["encrypt"]);
         const iv = window.crypto.getRandomValues(new Uint8Array(12));
         const encrypted = new Uint8Array(await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(token)));
