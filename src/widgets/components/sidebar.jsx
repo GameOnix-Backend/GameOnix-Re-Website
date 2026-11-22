@@ -425,8 +425,8 @@ function Sidebar({ collapsed, onToggle }) {
             </span>
             {!collapsed && (
               <span className="sidebar-launcher-copy">
-                <strong>Get GameOnix Launcher</strong>
-                <small>Discover games on desktop</small>
+                <strong>Download Launcher</strong>
+                <small>GameOnix for Windows</small>
               </span>
             )}
             {!collapsed && <FontAwesomeIcon icon={faChevronRight} className="sidebar-launcher-arrow" />}

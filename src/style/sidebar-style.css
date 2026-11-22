@@ -243,25 +243,27 @@
 
 .sidebar-launcher-link {
   min-width: 0;
-  min-height: 54px;
+  min-height: 58px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 9px;
-  padding: 7px 9px;
-  border: 1px solid rgba(167, 139, 250, 0.24);
-  border-radius: 11px;
-  background: linear-gradient(115deg, rgba(112, 76, 210, 0.2), rgba(75, 54, 123, 0.12));
-  color: var(--text-primary);
+  gap: 9px;
+  margin: 0 0 10px;
+  padding: 8px 9px;
+  border: 1px solid rgba(177, 148, 255, 0.48);
+  border-radius: 12px;
+  background: linear-gradient(112deg, #392267 0%, #271b43 62%, #1e1b2a 100%);
+  color: #fff;
   text-decoration: none;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 16px rgba(71, 44, 133, 0.2);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .sidebar-launcher-link:hover,
 .sidebar-launcher-link.active {
-  border-color: rgba(167, 139, 250, 0.55);
-  background: linear-gradient(115deg, rgba(124, 86, 232, 0.3), rgba(82, 57, 142, 0.2));
+  border-color: #b59aff;
+  background: linear-gradient(112deg, #51318c 0%, #36255b 65%, #272033 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 5px 18px rgba(90, 59, 166, 0.34);
 }
 
 .sidebar-launcher-link:hover { transform: translateY(-1px); }
@@ -272,11 +274,12 @@
   flex: 0 0 34px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(167, 139, 250, 0.28);
-  border-radius: 9px;
-  background: rgba(139, 92, 246, 0.2);
-  color: #c4adff;
-  font-size: 13px;
+  border: 1px solid rgba(207, 189, 255, 0.42);
+  border-radius: 10px;
+  background: linear-gradient(145deg, #9b78ff, #7048dc);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(112, 72, 220, 0.32);
 }
 
 .sidebar-launcher-copy {
@@ -288,24 +291,20 @@
 }
 
 .sidebar-launcher-copy strong {
-  overflow: hidden;
   font-size: 11px;
-  font-weight: 750;
-  text-overflow: ellipsis;
+  font-weight: 800;
   white-space: nowrap;
 }
 
 .sidebar-launcher-copy small {
-  overflow: hidden;
-  color: var(--text-muted);
+  color: #c7b8ec;
   font-size: 9px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .sidebar-launcher-arrow {
   flex: 0 0 auto;
-  color: #ac91ff;
+  color: #d2c2ff;
   font-size: 10px;
 }
 
