@@ -410,8 +410,6 @@ function Sidebar({ collapsed, onToggle }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <div className="sidebar-divider" />
-
           <NavLink
             to="/launcher"
             title={collapsed ? "Get GameOnix Launcher" : undefined}
@@ -431,6 +429,8 @@ function Sidebar({ collapsed, onToggle }) {
             )}
             {!collapsed && <FontAwesomeIcon icon={faChevronRight} className="sidebar-launcher-arrow" />}
           </NavLink>
+
+          <div className="sidebar-divider" />
 
           {authLoading ? (
             <div className="sidebar-account-link" aria-live="polite">
