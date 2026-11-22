@@ -23,6 +23,7 @@ import {
   faBug,
   faScrewdriverWrench,
   faStar,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useAuth } from "../../context/AuthContext";
@@ -410,6 +411,26 @@ function Sidebar({ collapsed, onToggle }) {
 
         <div className="sidebar-bottom">
           <div className="sidebar-divider" />
+
+          <NavLink
+            to="/launcher"
+            title={collapsed ? "Get GameOnix Launcher" : undefined}
+            aria-label="Get GameOnix Launcher"
+            className={({ isActive }) =>
+              `sidebar-launcher-link${isActive ? " active" : ""}`
+            }
+          >
+            <span className="sidebar-launcher-icon">
+              <FontAwesomeIcon icon={faDownload} />
+            </span>
+            {!collapsed && (
+              <span className="sidebar-launcher-copy">
+                <strong>Get GameOnix Launcher</strong>
+                <small>Discover games on desktop</small>
+              </span>
+            )}
+            {!collapsed && <FontAwesomeIcon icon={faChevronRight} className="sidebar-launcher-arrow" />}
+          </NavLink>
 
           {authLoading ? (
             <div className="sidebar-account-link" aria-live="polite">

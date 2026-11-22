@@ -241,6 +241,74 @@
   margin: 12px 0 10px;
 }
 
+.sidebar-launcher-link {
+  min-width: 0;
+  min-height: 54px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 9px;
+  padding: 7px 9px;
+  border: 1px solid rgba(167, 139, 250, 0.24);
+  border-radius: 11px;
+  background: linear-gradient(115deg, rgba(112, 76, 210, 0.2), rgba(75, 54, 123, 0.12));
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.sidebar-launcher-link:hover,
+.sidebar-launcher-link.active {
+  border-color: rgba(167, 139, 250, 0.55);
+  background: linear-gradient(115deg, rgba(124, 86, 232, 0.3), rgba(82, 57, 142, 0.2));
+}
+
+.sidebar-launcher-link:hover { transform: translateY(-1px); }
+
+.sidebar-launcher-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: 9px;
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4adff;
+  font-size: 13px;
+}
+
+.sidebar-launcher-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-launcher-copy strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-launcher-copy small {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-launcher-arrow {
+  flex: 0 0 auto;
+  color: #ac91ff;
+  font-size: 10px;
+}
+
 .sidebar-account-link {
   min-width: 0;
   min-height: 50px;
@@ -472,6 +540,17 @@
   flex-basis: 36px;
 }
 
+.sidebar-collapsed .sidebar-launcher-link {
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px;
+}
+
+.sidebar-collapsed .sidebar-launcher-icon {
+  width: 34px;
+  height: 34px;
+}
+
 /* =========================
    Logout confirmation popup
 ========================= */
@@ -687,10 +766,16 @@
   }
 
   .sidebar-link,
-  .sidebar-account-link {
+  .sidebar-account-link,
+  .sidebar-launcher-link {
     justify-content: center;
     padding: 0;
   }
+
+  .sidebar-launcher-link { min-height: 44px; }
+
+  .sidebar-launcher-copy,
+  .sidebar-launcher-arrow { display: none; }
 
   .sidebar-bottom .sidebar-divider {
     margin: 12px 0 10px;
