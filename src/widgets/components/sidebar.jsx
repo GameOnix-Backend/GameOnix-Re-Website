@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 
 import {
   faHouse,
@@ -429,6 +430,26 @@ function Sidebar({ collapsed, onToggle }) {
             )}
             {!collapsed && <FontAwesomeIcon icon={faChevronRight} className="sidebar-launcher-arrow" />}
           </NavLink>
+
+          <a
+            className="sidebar-discord-link"
+            href="https://discord.gg/QQ2ya3M5rg"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Join the GameOnix Discord community"
+            aria-label="Join the GameOnix Discord community"
+          >
+            <span className="sidebar-discord-icon">
+              <FontAwesomeIcon icon={faDiscord} />
+            </span>
+            {!collapsed && (
+              <span className="sidebar-discord-copy">
+                <strong>Join our Discord</strong>
+                <small>Meet the GameOnix community</small>
+              </span>
+            )}
+            {!collapsed && <FontAwesomeIcon icon={faChevronRight} className="sidebar-discord-arrow" />}
+          </a>
 
           <div className="sidebar-divider" />
 
