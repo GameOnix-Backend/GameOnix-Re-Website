@@ -22,12 +22,12 @@ import Support from "./pages/Support";
 import ReviewsPage from "./pages/reviews";
 import Launcher from "./pages/launcher";
 import DesktopLogin from "./pages/desktop-login";
+import { AUTH_API_BASE_URL } from "./api/session";
 
 import PageTitle from "./components/PageTitle";
 import "./style/site-control.css";
 
-const SITE_STATUS_URL =
-  "https://gameonix-backend.vercel.app/api/auth/me?siteStatus=1";
+const SITE_STATUS_URL = `${AUTH_API_BASE_URL}/me?siteStatus=1`;
 
 const SITE_MODE_CONTENT = {
   maintenance: {

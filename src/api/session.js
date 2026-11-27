@@ -1,17 +1,20 @@
 const SESSION_TOKEN_KEY = "gameonix_session_token";
-const COMMUNITY_AUTH_ME_URL =
-  "https://gameonix-backend.vercel.app/api/auth/me";
+// The original Vercel deployment is disabled. Keep the active API host in one
+// place so it can be changed at build time without editing every auth caller.
+export const AUTH_API_BASE_URL =
+  import.meta.env.VITE_AUTH_API_BASE_URL ||
+  "https://gameonix-backend-2.vercel.app/api/auth";
 // Reviews are served by the community endpoint (`?reviews=public`) because the
 // Vercel Hobby plan limits a deployment to 12 serverless functions.
 const REVIEWS_API_URL =
   import.meta.env.VITE_REVIEWS_API_URL ||
-  "https://gameonix-backend.vercel.app/api/auth/comments";
+  `${AUTH_API_BASE_URL}/comments`;
 
 export async function getCommunityApiToken() {
   // The frontend and API use separate domains, so browsers may block the
   // API's session cookie as a third-party cookie. Send the persisted bearer
   // token as well; /auth/me accepts either authentication method.
-  const response = await authFetch(`${COMMUNITY_AUTH_ME_URL}?token=true`, {
+  const response = await authFetch(`${AUTH_API_BASE_URL}/me?token=true`, {
     headers: { Accept: "application/json" },
   });
   const data = await response.json().catch(() => ({}));
