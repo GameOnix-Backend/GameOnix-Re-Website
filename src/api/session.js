@@ -7,6 +7,9 @@ export const AUTH_API_BASE_URL =
 export const WALLET_API_BASE_URL =
   import.meta.env.VITE_WALLET_API_BASE_URL ||
   "https://gameonix-fav-2.vercel.app/api/auth";
+export const COMMUNITY_API_BASE_URL =
+  import.meta.env.VITE_COMMUNITY_API_BASE_URL ||
+  "https://gameonix-fav-2.vercel.app/api";
 // Reviews are served by the community endpoint (`?reviews=public`) because the
 // Vercel Hobby plan limits a deployment to 12 serverless functions.
 const REVIEWS_API_URL =

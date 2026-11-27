@@ -30,7 +30,7 @@ import {
     addFavorite,
     removeFavorite,
 } from "../api/favorites";
-import { getCommunityApiToken } from "../api/session";
+import { getCommunityApiToken, COMMUNITY_API_BASE_URL } from "../api/session";
 import { addFollow, getFollows, recordGameActivity, removeFollow } from "../api/follows";
 import { useAuth } from "../context/AuthContext";
 import AddonsPanel from "../components/AddonsPanel";
@@ -44,8 +44,7 @@ import "./../style/game-details-style.css";
 
 const BANNERS_BASE_URL =
     "https://raw.githubusercontent.com/mhdpstudio/GameOnix-Data-Content/main/images/games/banners/";
-const GAME_REPORT_API_URL =
-    "https://gameonixfav.vercel.app/api/game-report";
+const GAME_REPORT_API_URL = `${COMMUNITY_API_BASE_URL}/game-report`;
 
 function RequirementsPanel({ game }) {
     const requirements = game?.requirements && typeof game.requirements === "object"

@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { faWindows } from "@fortawesome/free-brands-svg-icons";
 import { useAuth } from "../context/AuthContext";
+import { AUTH_API_BASE_URL } from "../api/session";
 import "../style/launcher-style.css";
 
 const RELEASE_API = "https://api.github.com/repos/mhdpstudio/GameOnix-App/releases/latest";
-const ANALYTICS_API = "https://gameonix-backend.vercel.app/api/auth/favorites";
+const ANALYTICS_API = `${AUTH_API_BASE_URL}/favorites`;
 
 export default function Launcher() {
   const { user } = useAuth();
