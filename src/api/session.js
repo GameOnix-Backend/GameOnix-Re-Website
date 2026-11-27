@@ -4,6 +4,9 @@ const SESSION_TOKEN_KEY = "gameonix_session_token";
 export const AUTH_API_BASE_URL =
   import.meta.env.VITE_AUTH_API_BASE_URL ||
   "https://gameonix-backend-2.vercel.app/api/auth";
+export const WALLET_API_BASE_URL =
+  import.meta.env.VITE_WALLET_API_BASE_URL ||
+  "https://gameonix-fav-2.vercel.app/api/auth";
 // Reviews are served by the community endpoint (`?reviews=public`) because the
 // Vercel Hobby plan limits a deployment to 12 serverless functions.
 const REVIEWS_API_URL =
